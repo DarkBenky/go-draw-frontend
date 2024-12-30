@@ -38,8 +38,8 @@
 
     <!-- Additional Settings -->
     <h3>Additional Settings</h3>
-    <div class="sliders">
-      <div v-for="slider in sliders" :key="slider.name" class="slider">
+    <div class="sliders-v2">
+      <div v-for="slider in sliders" :key="slider.name" class="slider-v2">
         <label :for="slider.name">{{ slider.name }}:</label>
         <input
           type="range"
@@ -162,6 +162,16 @@ h4 {
   border-radius: 4px;
 }
 
+.slider-v2 {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
 label {
   font-size: 0.8rem;
 }
@@ -257,6 +267,17 @@ h3 {
 
 .channel-inputs,
 .sliders {
+  background: rgba(42, 42, 42, 0.6);
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sliders-v2 {
+    display: grid;
+    grid-template-columns: auto auto;
   background: rgba(42, 42, 42, 0.6);
   padding: 2rem;
   border-radius: 12px;
