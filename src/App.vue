@@ -1,7 +1,14 @@
 <template>
   <div id="app">
-    <ColorPicker />
-    <RenderOptions />
+    <div class="element">
+      <ColorPicker />
+    </div>
+    <div class="element">
+      <RenderOptions />
+    </div>
+    <div class="element">
+      <ShaderMenu />
+    </div>
   </div>
 </template>
 
@@ -9,12 +16,14 @@
 // import HelloWorld from './components/HelloWorld.vue'
 import ColorPicker from './components/ColorPicker.vue';
 import RenderOptions from './components/RenderOptions.vue';
+import ShaderMenu from './components/ShaderMenu.vue';
 
 export default {
   name: 'App',
   components: {
     ColorPicker,
-    RenderOptions
+    RenderOptions,
+    ShaderMenu
   }
 }
 </script>
@@ -27,7 +36,16 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
- margin: 0;
- padding: 0;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+ margin: 0px;
+ padding: 20px;
+ background: #2c3e50;
+}
+
+.element {
+  margin: 10px;
+  padding: 10px;
 }
 </style>

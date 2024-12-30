@@ -118,6 +118,9 @@ export default {
                 .then(response => {
                     console.log(response.data)
                 })
+                .catch(error => {
+                    console.error(error)
+                })
         }
     }
 }
@@ -131,7 +134,6 @@ export default {
   color: #e1e1e1;
   padding: 1rem;
   max-width: 900px;
-  margin: 1rem auto;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
