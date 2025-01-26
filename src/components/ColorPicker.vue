@@ -56,17 +56,13 @@
 </template>
 
 <script>
-import { inject } from "vue";
 import axios from "axios";
 
 export default {
   name: "ColorPicker",
-  setup() {
-    const apiAddress = inject("apiAddress");
-    return { apiAddress };
-  },
   data() {
     return {
+      url : "http://localhost:5053",
       rgbaChannels: [
         { name: "R", value: 0, multiplier: 1 },
         { name: "G", value: 0, multiplier: 1 },
@@ -96,26 +92,26 @@ export default {
   methods: {
     submitColor() {
       const colorData = {
-        r: this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier,
-        g: this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier,
-        b: this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier,
-        a: this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier,
-        reflection: this.sliders[0].value,
-        directToScatter: this.sliders[1].value,
-        roughness: this.sliders[2].value,
-        metallic: this.sliders[3].value,
+        r: parseFloat((this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier).toFixed(2)),
+        g: parseFloat((this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier).toFixed(2)),
+        b: parseFloat((this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier).toFixed(2)),
+        a: parseFloat((this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier).toFixed(2)),
+        reflection: parseFloat(this.sliders[0].value.toFixed(2)),
+        directToScatter: parseFloat(this.sliders[1].value.toFixed(2)),
+        roughness: parseFloat(this.sliders[2].value.toFixed(2)),
+        metalic: parseFloat(this.sliders[3].value.toFixed(2))
       };
 
       axios
-        .post(`${this.apiAddress}/color`, colorData)
+        .post(`${this.url}/color`, colorData)
         .then((response) => {
           console.log(response.data);
         })
         .catch((error) => {
           console.error(error);
         });
-    },
-  },
+    }
+  }
 };
 </script>
 
