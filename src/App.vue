@@ -9,6 +9,9 @@
     <div class="element">
       <ShaderMenu />
     </div>
+    <div class="element">
+      <VoxelPicker />
+    </div>
   </div>
 </template>
 
@@ -17,13 +20,15 @@
 import ColorPicker from './components/ColorPicker.vue';
 import RenderOptions from './components/RenderOptions.vue';
 import ShaderMenu from './components/ShaderMenu.vue';
+import VoxelPicker from './components/VoxelPicker.vue';
 
 export default {
   name: 'App',
   components: {
     ColorPicker,
     RenderOptions,
-    ShaderMenu
+    ShaderMenu,
+    VoxelPicker
   }
 }
 </script>
