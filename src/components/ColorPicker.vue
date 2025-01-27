@@ -92,10 +92,10 @@ export default {
   methods: {
     submitColor() {
       const colorData = {
-        r: parseFloat((this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier).toFixed(2)),
-        g: parseFloat((this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier).toFixed(2)),
-        b: parseFloat((this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier).toFixed(2)),
-        a: parseFloat((this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier).toFixed(2)),
+        r: parseFloat((this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier / 255)),
+        g: parseFloat((this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier / 255)),
+        b: parseFloat((this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier / 255)),
+        a: parseFloat((this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier / 255)),
         reflection: parseFloat(this.sliders[0].value.toFixed(2)),
         directToScatter: parseFloat(this.sliders[1].value.toFixed(2)),
         roughness: parseFloat(this.sliders[2].value.toFixed(2)),
