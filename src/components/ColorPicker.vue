@@ -103,7 +103,7 @@ export default {
       };
 
       axios
-        .post(`${this.url}/color`, colorData)
+        .post(`${this.url}/submitColor`, colorData)
         .then((response) => {
           console.log(response.data);
         })
