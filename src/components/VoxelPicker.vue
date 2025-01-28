@@ -127,15 +127,15 @@
             type="range"
             v-model.number="density"
             min="0"
-            max="1"
+            max="0.1"
             step="0.00001"
           />
           <input
             type="number"
             v-model.number="density"
             min="0"
-            max="1"
-            step="0.01"
+            max="0.1"
+            step="0.0001"
             class="number-input"
           />
         </div>
@@ -186,7 +186,7 @@
           { name: "B", value: 200, multiplier: 1 },
           { name: "A", value: 100, multiplier: 1 },
         ],
-        density: 0.5,
+        density: 0.0,
         transmittance: 0.5,
         randomnessScale: 50,
       };
@@ -221,15 +221,22 @@
       submitVolumeColors() {
         const voxel = this.convertChannels(this.voxelColor);
         const smoke = this.convertChannels(this.smokeColor);
+        console.log(this.voxelColor, this.smokeColor);
         const payload = {
-          voxelColor: voxel,
-          smokeColor: smoke,
+          voxelColorR : voxel[0].value,
+          voxelColorG : voxel[1].value,
+          voxelColorB : voxel[2].value,
+          voxelColorA : voxel[3].value,
+          smokeColorR : smoke[0].value,
+          smokeColorG : smoke[1].value,
+          smokeColorB : smoke[2].value,
+          smokeColorA : smoke[3].value,
           density: this.density,
           transmittance: this.transmittance,
           randomness: this.colorRandomness === "random" ? this.randomnessScale : 0,
         };
         axios
-          .post(`${this.apiAddress}/volume-colors`, payload)
+          .post(`${this.apiAddress}/submitVoxel`, payload)
           .then((res) => console.log(res.data))
           .catch((err) => console.error(err));
       },
