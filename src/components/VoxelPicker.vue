@@ -226,6 +226,7 @@
           smokeColor: smoke,
           density: this.density,
           transmittance: this.transmittance,
+          randomness: this.colorRandomness === "random" ? this.randomnessScale : 0,
         };
         axios
           .post(`${this.apiAddress}/volume-colors`, payload)
