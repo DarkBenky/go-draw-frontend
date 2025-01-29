@@ -3,7 +3,81 @@
       <h2>Volume Picker</h2>
   
       <button @click="submitVolumeColors">Submit Volume Colors</button>
+      
+
+      <!-- Randomness Select -->
+      <div class="randomness-select">
+        <label>Color Randomness:</label>
+        <select v-model="colorRandomnessVoxel">
+          <option value="none">None</option>
+          <option value="random">Random</option>
+        </select>
+      </div>
   
+      <!-- Add after randomness select -->
+      <div class="randomness-control" v-if="colorRandomnessVoxel === 'random'">
+        <label>Randomness Scale:</label>
+        <div class="slider-v2">
+          <input
+            type="range"
+            v-model.number="randomnessScaleVoxel"
+            min="1"
+            max="255"
+            step="1"
+          />
+          <input
+            type="number"
+            v-model.number="randomnessScaleVoxel"
+            min="1"
+            max="255"
+            class="number-input"
+          />
+        </div>
+      </div>
+      
+  
+      <!-- Voxel Color Section -->
+      <div class="color-section">
+        <h3>Voxel Color</h3>
+        <div class="channel-inputs">
+          <div v-for="channel in voxelColor" :key="channel.name" class="channel">
+            <label>{{ channel.name }}:</label>
+            <input
+              type="range"
+              v-model.number="channel.value"
+              min="0"
+              max="255"
+            />
+            <input
+              type="number"
+              v-model.number="channel.value"
+              min="0"
+              max="255"
+              class="number-input"
+            />
+            <label>Mul:</label>
+            <input
+              type="range"
+              v-model.number="channel.multiplier"
+              min="1"
+              max="10"
+              step="0.1"
+            />
+            <input
+              type="number"
+              v-model.number="channel.multiplier"
+              min="1"
+              max="10"
+              step="0.1"
+              class="number-input"
+            />
+          </div>
+        </div>
+        <div class="color-preview" :style="{ backgroundColor: voxelPreviewColor }"></div>
+      </div>
+  
+      <!-- Smoke Color Section -->
+
       <!-- Randomness Select -->
       <div class="randomness-select">
         <label>Color Randomness:</label>
@@ -33,52 +107,8 @@
           />
         </div>
       </div>
-  
-      <!-- Voxel Color Section -->
-      <div class="color-section">
-        <h3>Voxel Color</h3>
-        <div class="channel-inputs">
-          <div v-for="channel in voxelColor" :key="channel.name" class="channel">
-            <label>{{ channel.name }}:</label>
-            <input
-              type="range"
-              v-model.number="channel.value"
-              min="0"
-              max="255"
-              @input="applyRandomness(channel)"
-            />
-            <input
-              type="number"
-              v-model.number="channel.value"
-              min="0"
-              max="255"
-              class="number-input"
-              @input="applyRandomness(channel)"
-            />
-            <label>Mul:</label>
-            <input
-              type="range"
-              v-model.number="channel.multiplier"
-              min="1"
-              max="10"
-              step="0.1"
-              @input="applyRandomness(channel)"
-            />
-            <input
-              type="number"
-              v-model.number="channel.multiplier"
-              min="1"
-              max="10"
-              step="0.1"
-              class="number-input"
-              @input="applyRandomness(channel)"
-            />
-          </div>
-        </div>
-        <div class="color-preview" :style="{ backgroundColor: voxelPreviewColor }"></div>
-      </div>
-  
-      <!-- Smoke Color Section -->
+
+
       <div class="color-section">
         <h3>Smoke Color</h3>
         <div class="channel-inputs">
@@ -174,6 +204,7 @@
     data() {
       return {
         colorRandomness: "none",
+        colorRandomnessVoxel: "none",
         voxelColor: [
           { name: "R", value: 128, multiplier: 1 },
           { name: "G", value: 128, multiplier: 1 },
@@ -189,6 +220,7 @@
         density: 0.0,
         transmittance: 0.5,
         randomnessScale: 50,
+        randomnessScaleVoxel : 50,
       };
     },
     computed: {
@@ -234,6 +266,7 @@
           density: this.density,
           transmittance: this.transmittance,
           randomness: this.colorRandomness === "random" ? this.randomnessScale : 0,
+          randomnessVoxel: this.colorRandomnessVoxel === "random" ? this.randomnessScaleVoxel : 0,
         };
         axios
           .post(`${this.apiAddress}/submitVoxel`, payload)
