@@ -13,6 +13,15 @@
           <option value="random">Random</option>
         </select>
       </div>
+
+      <!-- Render Voxels Select -->
+      <div class="randomness-select">
+        <label>Render Voxels</label>
+        <select v-model="renderVoxel">
+          <option value="false">False</option>
+          <option value="true">True</option>
+        </select>
+      </div>
   
       <!-- Add after randomness select -->
       <div class="randomness-control" v-if="colorRandomnessVoxel === 'random'">
@@ -84,6 +93,16 @@
         <select v-model="colorRandomness">
           <option value="none">None</option>
           <option value="random">Random</option>
+        </select>
+      </div>
+
+
+       <!-- Render Voxels Select -->
+       <div class="randomness-select">
+        <label>Render Volume</label>
+        <select v-model="renderVolume">
+          <option value="false">False</option>
+          <option value="true">True</option>
         </select>
       </div>
   
@@ -221,6 +240,8 @@
         transmittance: 0.5,
         randomnessScale: 50,
         randomnessScaleVoxel : 50,
+        renderVolume : false,
+        renderVoxel : false,
       };
     },
     computed: {
@@ -267,6 +288,8 @@
           transmittance: this.transmittance,
           randomness: this.colorRandomness === "random" ? this.randomnessScale : 0,
           randomnessVoxel: this.colorRandomnessVoxel === "random" ? this.randomnessScaleVoxel : 0,
+          renderVolume : Boolean(this.renderVolume),
+          renderVoxel : Boolean(this.renderVoxel),
         };
         axios
           .post(`${this.apiAddress}/submitVoxel`, payload)
