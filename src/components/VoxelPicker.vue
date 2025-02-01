@@ -238,8 +238,8 @@
         ],
         density: 0.0,
         transmittance: 0.5,
-        randomnessScale: 50,
-        randomnessScaleVoxel : 50,
+        randomnessScale: 10,
+        randomnessScaleVoxel : 10,
         renderVolume : false,
         renderVoxel : false,
       };
