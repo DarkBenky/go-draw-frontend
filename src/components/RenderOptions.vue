@@ -127,144 +127,141 @@ export default {
 </script>
 
 <style scoped>
-
-.color-picker, .render-options {
-  background: #1a1a1a;
-  border-radius: 12px;
-  color: #e1e1e1;
-  padding: 1rem;
-  max-width: 900px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+.render-options {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-unit);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-unit);
 }
 
-/* Headings */
-.color-picker h2, .render-options h3 {
-  color: #ffffff;
-  margin: 1rem 0;
-  font-weight: 600;
-  font-size: 1.2rem;
-}
-
-/* Cards and sections */
-.option-card,
-.channel-inputs,
-.sliders {
-  background: #2a2a2a;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-/* Labels */
-label {
-  font-size: 0.9rem;
-  color: #a1a1a1;
-}
-
-/* Buttons */
-button,
 .btn {
-  background: linear-gradient(135deg, #4a9eff, #3a8eef);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent-primary), #3a8eef);
+  color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--border-radius);
   font-weight: 600;
-  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 3px 10px rgba(74, 158, 255, 0.2);
-}
-button:hover,
-.btn:hover {
-  background: linear-gradient(135deg, #5db1ff, #4a9eff);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(74, 158, 255, 0.3);
-}
-button:active,
-.btn:active {
-  transform: translateY(0);
-  box-shadow: 0 3px 10px rgba(74, 158, 255, 0.2);
+  transition: all 0.2s;
+  margin-bottom: var(--spacing-unit);
 }
 
-/* Sliders */
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-unit);
+  overflow-y: auto;
+}
+
+.option-card {
+  background: var(--bg-tertiary);
+  padding: var(--spacing-unit);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slider-group, .slider-with-input {
+  margin-bottom: var(--spacing-unit);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: calc(var(--spacing-unit) * 0.5);
+  align-items: center;
+}
+
 input[type="range"] {
   width: 100%;
   height: 4px;
-  border-radius: 4px;
-  background: #3a3a3a;
+  background: linear-gradient(90deg, var(--accent-primary), #3a8eef);
+  border-radius: 2px;
   appearance: none;
-  margin: 0;
-  cursor: pointer;
 }
+
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  width: 14px;
-  height: 14px;
-  background: #4a9eff;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-primary);
   border-radius: 50%;
-  transition: transform 0.15s ease;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
+
 input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.2);
 }
 
-/* Numeric input */
 .number-input {
   width: 80px;
-  padding: 0.3rem;
-  font-size: 0.9rem;
-  text-align: right;
-  border: 1px solid #3a3a3a;
+  padding: 0.4rem;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
-  background: #2a2a2a;
-  color: #e1e1e1;
+  color: var(--text-primary);
+  text-align: right;
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Selects */
-select {
-  width: 100%;
-  padding: 0.4rem;
-  border: 1px solid #3a3a3a;
-  border-radius: 4px;
-  background: #2a2a2a;
-  color: #e1e1e1;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-select:hover {
-  border-color: #4a9eff;
-}
-
-/* Responsive grid tweaks */
-.options-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-}
 .options-flex {
   display: grid;
-  gap: 1rem;
+  gap: var(--spacing-unit);
 }
 
-/* Adjusted scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
+.select-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: calc(var(--spacing-unit) * 0.5);
 }
-::-webkit-scrollbar-track {
-  background: #1a1a1a;
-}
-::-webkit-scrollbar-thumb {
-  background: #3a3a3a;
+
+select {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #4a9eff;
+  color: var(--text-primary);
+  cursor: pointer;
 }
 
+select:hover {
+  border-color: var(--accent-primary);
+}
+
+h3, h4 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-unit);
+}
+
+h4 {
+  color: var(--accent-primary);
+  font-size: 0.9rem;
+}
+
+label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .select-group {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
 </style>
+

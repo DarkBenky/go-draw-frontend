@@ -211,102 +211,152 @@ export default {
 
 <style scoped>
 .shader-menu {
-    background: #1a1a1a;
-    padding: 1rem;
-    border-radius: 8px;
-    color: #e1e1e1;
-}
-
-.add-shader {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.shader-list {
-    list-style: none;
-    padding: 0;
-    margin: 1rem 0;
-}
-
-.shader-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #2a2a2a;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.shader-item:hover {
-    background: #333;
-}
-
-.shader-item.selected {
-    background: #4a9eff;
-}
-
-.shader-controls {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.control-group {
-    display: grid;
-    grid-template-columns: 100px 1fr auto;
-    gap: 0.5rem;
-    align-items: center;
-    margin-bottom: 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-unit);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-unit);
+  overflow-y: auto;
 }
 
 .btn {
-    background: #4a9eff;
-    border: none;
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
-    margin-bottom: 15px;
+  background: linear-gradient(135deg, var(--accent-primary), #3a8eef);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-button {
-    background: #4a9eff;
-    border: none;
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
+.add-shader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
 }
 
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.shader-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing-unit) * 0.5);
 }
 
-select,
-input[type="number"] {
-    background: #2a2a2a;
-    border: 1px solid #3a3a3a;
-    padding: 0.3rem;
-    color: #e1e1e1;
-    border-radius: 4px;
+.shader-item {
+  background: var(--bg-tertiary);
+  padding: var(--spacing-unit);
+  border-radius: var(--border-radius);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-input[type="range"] {
-    width: 100%;
+.shader-item:hover {
+  transform: translateX(4px);
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+}
+
+.shader-item.selected {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.shader-controls {
+  display: flex;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
+.shader-controls button {
+  padding: 0.3rem 0.6rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: calc(var(--border-radius) * 0.5);
 }
 
 .shader-edit-panel {
-    background: #2a2a2a;
-    padding: 1rem;
-    margin-top: 1rem;
-    border-radius: 4px;
+  background: var(--bg-tertiary);
+  padding: var(--spacing-unit);
+  border-radius: var(--border-radius);
+  margin-top: var(--spacing-unit);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-h4 {
-    margin: 0 0 1rem 0;
-    color: #4a9eff;
+.control-group {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: calc(var(--spacing-unit) * 0.5);
+  align-items: center;
+  margin-bottom: calc(var(--spacing-unit) * 0.8);
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-primary), #3a8eef);
+  border-radius: 2px;
+  appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+input[type="number"], select {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  padding: 0.4rem;
+  border-radius: calc(var(--border-radius) * 0.5);
+  width: 80px;
+}
+
+input[type="color"] {
+  width: 60px;
+  height: 30px;
+  border: none;
+  border-radius: calc(var(--border-radius) * 0.5);
+  cursor: pointer;
+}
+
+h3, h4 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-unit);
+}
+
+label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+span {
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .control-group {
+    grid-template-columns: 100px 1fr auto;
+  }
+  
+  .add-shader {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
+
