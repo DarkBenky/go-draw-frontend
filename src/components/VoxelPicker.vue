@@ -274,23 +274,24 @@
       submitVolumeColors() {
         const voxel = this.convertChannels(this.voxelColor);
         const smoke = this.convertChannels(this.smokeColor);
-        console.log(this.voxelColor, this.smokeColor);
+        
         const payload = {
-          voxelColorR : voxel[0].value,
-          voxelColorG : voxel[1].value,
-          voxelColorB : voxel[2].value,
-          voxelColorA : voxel[3].value,
-          smokeColorR : smoke[0].value,
-          smokeColorG : smoke[1].value,
-          smokeColorB : smoke[2].value,
-          smokeColorA : smoke[3].value,
+          voxelColorR: voxel[0].value,
+          voxelColorG: voxel[1].value,
+          voxelColorB: voxel[2].value,
+          voxelColorA: voxel[3].value,
+          smokeColorR: smoke[0].value,
+          smokeColorG: smoke[1].value,
+          smokeColorB: smoke[2].value,
+          smokeColorA: smoke[3].value,
           density: this.density,
           transmittance: this.transmittance,
           randomness: this.colorRandomness === "random" ? this.randomnessScale : 0,
           randomnessVoxel: this.colorRandomnessVoxel === "random" ? this.randomnessScaleVoxel : 0,
-          renderVolume : Boolean(this.renderVolume),
-          renderVoxel : Boolean(this.renderVoxel),
+          renderVolume: this.renderVolume === "true", // Convert to boolean
+          renderVoxel: this.renderVoxel === "true"    // Convert to boolean
         };
+      
         axios
           .post(`${this.apiAddress}/submitVoxel`, payload)
           .then((res) => console.log(res.data))
