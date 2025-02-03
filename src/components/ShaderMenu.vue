@@ -91,6 +91,21 @@
                     <span>{{ selectedShader.Sharpness.toFixed(2) }}</span>
                 </div>
             </template>
+
+            <template v-if="selectedShader.type === 'colorMapping'">
+                <div class="control-group">
+                    <label>Color R:</label>
+                    <input type="number" v-model.number="selectedShader.ColorR" min="0" max="255" />
+                </div>
+                <div class="control-group">
+                    <label>Color G:</label>
+                    <input type="number" v-model.number="selectedShader.ColorG" min="0" max="255" />
+                </div>
+                <div class="control-group">
+                    <label>Color B:</label>
+                    <input type="number" v-model.number="selectedShader.ColorB" min="0" max="255" />
+                </div>
+            </template>
         </div>
     </div>
 </template>
@@ -125,6 +140,12 @@ export default {
                     Sharpness: 1.0,
                     amount: 0.1,
                     multipass: 1,
+                },
+                colorMapping: {
+                    ColorR :16,
+                    ColorG :16,
+                    ColorB :16,
+                    amount: 0.1,
                 },
             },
             selectedType: "contrast",
