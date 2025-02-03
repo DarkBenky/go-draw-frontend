@@ -1,129 +1,143 @@
 <template>
-    <div class="render-options">
-        <h3>Render Options</h3>
+  <div class="render-options">
+    <h3>Render Options</h3>
 
-        <button @click="SubmitRenderOptions" class="btn">Submit Render Options</button>
+    <button @click="SubmitRenderOptions" class="btn">
+      Submit Render Options
+    </button>
 
-        <div class="options-grid">
-            <!-- Main Parameters Section -->
-            <div class="option-card">
-                <h4>Main Parameters</h4>
-                <div class="slider-group" v-for="param in exponentialParams" :key="param.name">
-                    <div class="slider-with-input">
-                        <label>{{ param.name }}</label>
-                        <div class="controls">
-                            <input type="range" v-model.number="param.value" :min="0" :max="6" step="1"
-                                @input="updateExponentialValue(param)" />
-                            <input type="number" v-model.number="param.actualValue" @input="updateSliderValue(param)"
-                                class="number-input" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gamma Control -->
-                <div class="slider-with-input">
-                    <label>Gamma</label>
-                    <div class="controls">
-                        <input type="range" v-model.number="gamma" min="0" max="10" step="0.1" />
-                        <input type="number" v-model.number="gamma" step="0.1" class="number-input" />
-                    </div>
-                </div>
+    <div class="options-grid">
+      <!-- Main Parameters Section -->
+      <div class="option-card">
+        <h4>Main Parameters</h4>
+        <div class="slider-group" v-for="param in exponentialParams" :key="param.name">
+          <div class="slider-with-input">
+            <label>{{ param.name }}</label>
+            <div class="controls">
+              <input type="range" v-model.number="param.value" :min="0" :max="6" step="1"
+                @input="updateExponentialValue(param)" />
+              <input type="number" v-model.number="param.actualValue" @input="updateSliderValue(param)"
+                class="number-input" />
             </div>
-
-            <!-- Render Settings Section -->
-            <div class="option-card">
-                <h4>Render Settings</h4>
-                <div class="options-flex">
-                    <div class="select-group" v-for="option in binaryOptions" :key="option.name">
-                        <label>{{ option.name }}</label>
-                        <select v-model="option.value">
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-
-                    <div class="select-group">
-                        <label>Resolution</label>
-                        <select v-model="resolution">
-                            <option v-for="res in resolutions" :key="res" :value="res">
-                                {{ res }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="select-group">
-                        <label>Version</label>
-                        <select v-model="renderVersion">
-                            <option v-for="version in renderVersions" :key="version" :value="version">
-                                {{ version }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+
+        <!-- Gamma Control -->
+        <div class="slider-with-input">
+          <label>Gamma</label>
+          <div class="controls">
+            <input type="range" v-model.number="gamma" min="0" max="10" step="0.1" />
+            <input type="number" v-model.number="gamma" step="0.1" class="number-input" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Render Settings Section -->
+      <div class="option-card">
+        <h4>Render Settings</h4>
+        <div class="options-flex">
+          <div class="select-group" v-for="option in binaryOptions" :key="option.name">
+            <label>{{ option.name }}</label>
+            <select v-model="option.value">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <div class="select-group">
+            <label>Mode</label>
+            <select v-model="selectedMode">
+              <option v-for="mode in modes" :key="mode" :value="mode">
+                {{ mode }}
+              </option>
+            </select>
+          </div>
+
+          <div class="select-group">
+            <label>Resolution</label>
+            <select v-model="resolution">
+              <option v-for="res in resolutions" :key="res" :value="res">
+                {{ res }}
+              </option>
+            </select>
+          </div>
+
+          <div class="select-group">
+            <label>Version</label>
+            <select v-model="renderVersion">
+              <option v-for="version in renderVersions" :key="version" :value="version">
+                {{ version }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
-
-import axios from 'axios';
-import { inject } from 'vue';
+import axios from "axios";
+import { inject } from "vue";
 
 export default {
-    name: 'RenderOptions',
-    setup() {
-        const apiAddress = inject('apiAddress')
-        return { apiAddress }
-    },
+  name: "RenderOptions",
+  setup() {
+    const apiAddress = inject("apiAddress");
+    return { apiAddress };
+  },
 
-    data() {
-        return {
-            exponentialParams: [
-                { name: 'Depth', value: 3, actualValue: 8 },
-                { name: 'Scatter', value: 3, actualValue: 8 }
-            ],
-            binaryOptions: [
-                { name: 'Snap Light to Camera', value: 'no' },
-                { name: 'Raymarching', value: 'no' },
-                { name: 'Performance Mode', value: 'no' }
-            ],
-            resolution: 'Native',
-            resolutions: ['Native', '2x', '4x', '8x'],
-            renderVersion: 'V2',
-            renderVersions: ['V1', 'V2', 'V2-Log', 'V2-Linear'],
-            gamma: 2.2
-        }
+  data() {
+    return {
+      exponentialParams: [
+        { name: "Depth", value: 3, actualValue: 8 },
+        { name: "Scatter", value: 3, actualValue: 8 },
+      ],
+      binaryOptions: [
+        { name: "Snap Light to Camera", value: "no" },
+        { name: "Raymarching", value: "no" },
+        { name: "Performance Mode", value: "no" },
+      ],
+      resolution: "Native",
+      resolutions: ["Native", "2x", "4x", "8x"],
+      selectedMode: 'classic',
+      modes: ["classic", "normal", "depth"],
+      renderVersion: "V2",
+      renderVersions: ["V1", "V2", "V2-Log", "V2-Linear"],
+      gamma: 2.2,
+    };
+  },
+  methods: {
+    updateExponentialValue(param) {
+      param.actualValue = Math.pow(2, param.value);
     },
-    methods: {
-        updateExponentialValue(param) {
-            param.actualValue = Math.pow(2, param.value)
-        },
-        updateSliderValue(param) {
-            param.value = Math.log2(param.actualValue)
-        },
-        SubmitRenderOptions() {
-            console.log('Submitting render options...')
-            const renderOptions = {
-                Depth: this.exponentialParams[0].actualValue,
-                Scatter: this.exponentialParams[1].actualValue,
-                Gamma: this.gamma,
-                SnapLightToCamera: this.binaryOptions[0].value,
-                Raymarching: this.binaryOptions[1].value,
-                PerformanceMode: this.binaryOptions[2].value,
-                Resolution: this.resolution,
-                Version: this.renderVersion
-            }
-            axios.post(`${this.apiAddress}/render-options`, renderOptions)
-                .then(response => {
-                    console.log(response.data)
-                })
-                .catch(error => {
-                    console.error(error)
-                })
-        }
-    }
-}
+    updateSliderValue(param) {
+      param.value = Math.log2(param.actualValue);
+    },
+    SubmitRenderOptions() {
+      console.log("Submitting render options...");
+      const renderOptions = {
+        Depth: this.exponentialParams[0].actualValue,
+        Scatter: this.exponentialParams[1].actualValue,
+        Gamma: this.gamma,
+        SnapLightToCamera: this.binaryOptions[0].value,
+        Raymarching: this.binaryOptions[1].value,
+        PerformanceMode: this.binaryOptions[2].value,
+        Resolution: this.resolution,
+        Version: this.renderVersion,
+        Mode: this.selectedMode,
+      };
+      axios
+        .post(`${this.apiAddress}/render-options`, renderOptions)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -168,7 +182,8 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.slider-group, .slider-with-input {
+.slider-group,
+.slider-with-input {
   margin-bottom: var(--spacing-unit);
 }
 
@@ -210,7 +225,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: 4px;
   color: var(--text-primary);
   text-align: right;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
 }
 
 .options-flex {
@@ -238,7 +253,8 @@ select:hover {
   border-color: var(--accent-primary);
 }
 
-h3, h4 {
+h3,
+h4 {
   color: var(--text-primary);
   margin-bottom: var(--spacing-unit);
 }
@@ -257,11 +273,10 @@ label {
   .options-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .select-group {
     grid-template-columns: 1fr 1fr;
     align-items: center;
   }
 }
 </style>
-
