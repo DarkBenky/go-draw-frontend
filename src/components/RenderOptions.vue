@@ -22,15 +22,26 @@
           </div>
         </div>
 
+        <h4>Field of View</h4>
+        <div class="slider-with-input">
+          <label>FOV</label>
+          <div class="controls">
+            <input type="range" v-model.number="FOV" min="30" max="120" step="1" />
+            <input type="number" v-model.number="FOV" class="number-input" />
+          </div>
+        </div>
+
         <!-- Gamma Control -->
+        <h4>Gamma</h4>
         <div class="slider-with-input">
           <label>Gamma</label>
           <div class="controls">
-            <input type="range" v-model.number="gamma" min="0" max="10" step="0.1" />
+            <input type="range" v-model.number="gamma" min="0" max="10" step="0.01" />
             <input type="number" v-model.number="gamma" step="0.1" class="number-input" />
           </div>
         </div>
       </div>
+
 
       <!-- Render Settings Section -->
       <div class="option-card">
@@ -98,6 +109,7 @@ export default {
         { name: "Raymarching", value: "no" },
         { name: "Performance Mode", value: "no" },
       ],
+      FOV : 90,
       resolution: "Native",
       resolutions: ["Native", "2x", "4x", "8x"],
       selectedMode: 'Classic',
@@ -126,6 +138,7 @@ export default {
         resolution: this.resolution,
         version: this.renderVersion,
         mode: this.selectedMode,
+        fov : this.FOV,
       };
       axios
         .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)
