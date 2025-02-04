@@ -117,18 +117,18 @@ export default {
     SubmitRenderOptions() {
       console.log("Submitting render options...");
       const renderOptions = {
-        Depth: this.exponentialParams[0].actualValue,
-        Scatter: this.exponentialParams[1].actualValue,
-        Gamma: this.gamma,
-        SnapLightToCamera: this.binaryOptions[0].value,
-        Raymarching: this.binaryOptions[1].value,
-        PerformanceMode: this.binaryOptions[2].value,
-        Resolution: this.resolution,
-        Version: this.renderVersion,
-        Mode: this.selectedMode,
+        depth: this.exponentialParams[0].actualValue,
+        scatter: this.exponentialParams[1].actualValue,
+        gamma: this.gamma,
+        snapLight: this.binaryOptions[0].value === 'Yes',
+        rayMarching: this.binaryOptions[1].value === 'Yes',
+        performance: this.binaryOptions[2].value === 'Yes',
+        resolution: this.resolution,
+        version: this.renderVersion,
+        mode: this.selectedMode,
       };
       axios
-        .post(`${this.apiAddress}/render-options`, renderOptions)
+        .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)
         .then((response) => {
           console.log(response.data);
         })
