@@ -36,7 +36,7 @@
         <div class="slider-with-input">
           <label>Gamma</label>
           <div class="controls">
-            <input type="range" v-model.number="gamma" min="0" max="10" step="0.01" />
+            <input type="range" v-model.number="gamma" min="0" max="1" step="0.001" />
             <input type="number" v-model.number="gamma" step="0.1" class="number-input" />
           </div>
         </div>
@@ -116,7 +116,7 @@ export default {
       modes: ["Classic", "Normals", "Depth"],
       renderVersion: "V2",
       renderVersions: ["V1", "V2", "V2-Log", "V2-Linear"],
-      gamma: 2.2,
+      gamma: 0.25,
     };
   },
   methods: {
