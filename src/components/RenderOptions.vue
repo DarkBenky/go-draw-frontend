@@ -115,7 +115,7 @@ export default {
       selectedMode: 'Classic',
       modes: ["Classic", "Normals", "Depth"],
       renderVersion: "V2",
-      renderVersions: ["V1", "V2", "V2-Log", "V2-Linear"],
+      renderVersions: ["V1", "V2", "V2-Log", "V2-Linear", "V2-Linear-Texture", "V2-Log-Texture"],
       gamma: 0.25,
     };
   },
