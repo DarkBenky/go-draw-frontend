@@ -1,7 +1,6 @@
 <template>
   <div class="color-picker">
     <h2>Color Picker</h2>
-
     <div>
       <button @click="submitColor">Submit Color</button>
     </div>
@@ -10,23 +9,11 @@
     <div class="channel-inputs">
       <div v-for="channel in rgbaChannels" :key="channel.name" class="channel">
         <label :for="channel.name">{{ channel.name }}:</label>
-        <input
-          type="range"
-          :id="channel.name"
-          v-model.number="channel.value"
-          min="0"
-          max="255"
-        />
+        <input type="range" :id="channel.name" v-model.number="channel.value" min="0" max="255" />
         <span>{{ channel.value }}</span>
 
         <label :for="channel.name - multiplier">Multiplier:</label>
-        <input
-          type="range"
-          :id="`${channel.name}-multiplier`"
-          v-model.number="channel.multiplier"
-          min="1"
-          max="100"
-        />
+        <input type="range" :id="`${channel.name}-multiplier`" v-model.number="channel.multiplier" min="1" max="100" />
         <span>{{ channel.multiplier }}</span>
 
         <span>{{ channel.value * channel.multiplier }}</span>
@@ -34,21 +21,17 @@
     </div>
 
     <!-- Color Preview -->
-    <div class="color-preview" :style="{ backgroundColor: previewColor }"></div>
+    <div class="color-preview-container">
+      <div class="color-preview" :style="{ backgroundColor: previewColor }"></div>
+      <TextureCanvas :selectedColor="previewColor" />
+    </div>
 
     <!-- Additional Settings -->
     <h3>Additional Settings</h3>
     <div class="sliders-v2">
       <div v-for="slider in sliders" :key="slider.name" class="slider-v2">
         <label :for="slider.name">{{ slider.name }}:</label>
-        <input
-          type="range"
-          :id="slider.name"
-          v-model.number="slider.value"
-          min="0"
-          max="1"
-          step="0.01"
-        />
+        <input type="range" :id="slider.name" v-model.number="slider.value" min="0" max="1" step="0.01" />
         <span>{{ slider.value.toFixed(2) }}</span>
       </div>
     </div>
@@ -57,12 +40,16 @@
 
 <script>
 import axios from "axios";
+import TextureCanvas from "./TextureCanvas.vue";
 
 export default {
   name: "ColorPicker",
+  components: {
+    TextureCanvas,
+  },
   data() {
     return {
-      url : "http://localhost:5053",
+      url: "http://localhost:5053",
       rgbaChannels: [
         { name: "R", value: 0, multiplier: 1 },
         { name: "G", value: 0, multiplier: 1 },
@@ -116,6 +103,14 @@ export default {
 </script>
 
 <style scoped>
+
+.color-preview-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--spacing-unit);
+}
+
 .color-picker {
   background: var(--bg-secondary);
   border-radius: var(--border-radius);
@@ -164,12 +159,12 @@ button:hover {
 }
 
 .color-preview {
-  padding: 50px;
+  padding: 100px;
   height: 50px;
   border-radius: var(--border-radius);
   margin: var(--spacing-unit) 0;
   border: 2px solid rgba(255, 255, 255, 0.05);
-  background-image: 
+  background-image:
     linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
     linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
@@ -221,7 +216,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.2);
 }
 
-h2, h3 {
+h2,
+h3 {
   color: var(--text-primary);
   margin-bottom: var(--spacing-unit);
 }
@@ -241,10 +237,9 @@ span {
   .channel {
     grid-template-columns: 30px 1fr 60px;
   }
-  
+
   .slider-v2 {
     grid-template-columns: 100px 1fr 60px;
   }
 }
 </style>
-
