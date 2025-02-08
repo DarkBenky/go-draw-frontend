@@ -23,7 +23,7 @@
     <!-- Color Preview -->
     <div class="color-preview-container">
       <div class="color-preview" :style="{ backgroundColor: previewColor }"></div>
-      <TextureCanvas :selectedColor="previewColor" />
+      <TextureCanvas :selectedColor="previewColor" :MaterialProperties="materialProperties" />
     </div>
 
     <!-- Additional Settings -->
@@ -75,6 +75,14 @@ export default {
         b
       )}, ${a.toFixed(2)})`;
     },
+    materialProperties() {
+      return {
+        reflection: this.sliders[0].value.toFixed(2),
+        directToScatter: this.sliders[1].value.toFixed(2),
+        roughness: this.sliders[2].value.toFixed(2),
+        metallic: this.sliders[3].value.toFixed(2),
+      };
+    },
   },
   methods: {
     submitColor() {
@@ -103,7 +111,6 @@ export default {
 </script>
 
 <style scoped>
-
 .color-preview-container {
   display: grid;
   grid-template-columns: 1fr 1fr;

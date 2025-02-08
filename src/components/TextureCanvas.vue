@@ -6,6 +6,9 @@
                 <input type="file" accept="image/*" @change="handleImageUpload" />
                 📁 Choose File
             </label>
+            <button @click="submitTextures" class="custom-file-upload">
+                Submit Textures
+            </button>
         </div>
         <div class="texture-editor">
             <div class="texture-list">
@@ -25,11 +28,16 @@
 </template>
 
 <script>
+
 export default {
     name: 'TextureCanvas',
     props: {
         selectedColor: {
             type: String,
+            required: true
+        },
+        MaterialProperties: {
+            type: Object,
             required: true
         }
     },
@@ -40,6 +48,12 @@ export default {
             textures: Array(128).fill().map(() =>
                 new ImageData(128, 128)
             ),
+            textureProperties: Array(128).fill().map(() => ({
+                reflection: 0.5,
+                directToScatter: 0.5,
+                roughness: 0.5,
+                metallic: 0.5,
+            })),
             ctx: null,
             pixelSize: 4, // 512/128 = 4 pixels per grid cell
             brushSize: 1, // Add brush size
@@ -53,7 +67,21 @@ export default {
         this.drawGrid();
         this.loadTexture(0);
     },
+    watch: {
+        MaterialProperties: {
+            handler(newVal) {
+                console.log('Material Properties updated:', newVal);
+                this.textureProperties[this.currentTextureIndex] = newVal;
+                this.submitTextures(); // Optional: auto-submit when properties change
+            },
+            deep: true
+        }
+    },
     methods: {
+        submitTextures() {
+            console.log('Selected Textures:', this.textures[this.currentTextureIndex]);
+            console.log('Selected Color:', this.MaterialProperties);
+        },
         selectTexture(index) {
             if (index < 0 || index >= this.textures.length) {
                 console.error('Invalid texture index');
