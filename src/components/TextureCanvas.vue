@@ -2,20 +2,20 @@
     <div>
         <div class="tools">
             <div class="brush-size-indicator">Brush: {{ brushSize }}</div>
-            <label class="custom-file-upload">
+            <label class="custom-file-upload tool-button">
                 <input type="file" accept="image/*" @change="handleImageUpload" />
                 📁 Choose File
             </label>
-            <button @click="submitTextures" class="custom-file-upload">
-                Submit Textures {{ this.textureProperties[this.currentTextureIndex] }}
+            <button @click="submitTextures" class="custom-file-upload tool-button">
+                Submit Textures
             </button>
             <!-- Add normal map upload -->
-            <label class="custom-file-upload">
+            <label class="custom-file-upload tool-button">
+                <input type="file" accept="image/*" @change="handleNormalMapUpload" ref="normalMapInput" />
                 Upload Normals
-                <input type="file" accept="image/*" @change="handleNormalMapUpload" ref="normalMapInput">
             </label>
-            <button @click="openNormalMapGenerator" class="custom-file-upload">
-                No normals visit
+            <button @click="openNormalMapGenerator" class="custom-file-upload tool-button">
+                No Normals?
             </button>
         </div>
         <div class="texture-editor">
@@ -358,11 +358,19 @@ canvas {
     z-index: 1;
 }
 
+.tool-button {
+    min-width: 120px;
+    text-align: center;
+    white-space: nowrap;
+    padding: 8px 12px;
+}
+
 .custom-file-upload {
-    display: inline-block;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
-    padding: 8px 12px;
     border-radius: var(--border-radius);
     cursor: pointer;
     transition: all 0.2s ease;
