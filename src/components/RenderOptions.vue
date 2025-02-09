@@ -14,7 +14,7 @@
           <div class="slider-with-input">
             <label>{{ param.name }}</label>
             <div class="controls">
-              <input type="range" v-model.number="param.value" :min="0" :max="6" step="1"
+              <input type="range" v-model.number="param.value" :min="0" :max="10" step="1"
                 @input="updateExponentialValue(param)" />
               <input type="number" v-model.number="param.actualValue" @input="updateSliderValue(param)"
                 class="number-input" />
@@ -102,14 +102,14 @@ export default {
     return {
       exponentialParams: [
         { name: "Depth", value: 3, actualValue: 8 },
-        { name: "Scatter", value: 3, actualValue: 8 },
+        { name: "Scatter", value: 0, actualValue: 0 },
       ],
       binaryOptions: [
         { name: "Snap Light to Camera", value: "no" },
         { name: "Raymarching", value: "no" },
         { name: "Performance Mode", value: "no" },
       ],
-      FOV : 90,
+      FOV: 90,
       resolution: "Native",
       resolutions: ["Native", "2x", "4x", "8x"],
       selectedMode: 'Classic',
@@ -121,7 +121,13 @@ export default {
   },
   methods: {
     updateExponentialValue(param) {
-      param.actualValue = Math.pow(2, param.value);
+      // if (param.value <= 1 ) {
+      //   param.actualValue = 0;
+      // }
+      // else {
+        // param.value = param.value - 1;
+        param.actualValue = Math.pow(2, param.value) - 1;
+      // }
     },
     updateSliderValue(param) {
       param.value = Math.log2(param.actualValue);
@@ -138,7 +144,7 @@ export default {
         resolution: this.resolution,
         version: this.renderVersion,
         mode: this.selectedMode,
-        fov : this.FOV,
+        fov: this.FOV,
       };
       axios
         .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)

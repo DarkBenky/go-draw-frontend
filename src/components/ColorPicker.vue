@@ -23,7 +23,11 @@
     <!-- Color Preview -->
     <div class="color-preview-container">
       <div class="color-preview" :style="{ backgroundColor: previewColor }"></div>
-      <TextureCanvas :selectedColor="previewColor" :MaterialProperties="materialProperties" />
+      <TextureCanvas :selectedColor="previewColor" :MaterialProperties="materialProperties"
+        :R="this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier"
+        :G="this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier"
+        :B="this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier"
+        :A="this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier" />
     </div>
 
     <!-- Additional Settings -->

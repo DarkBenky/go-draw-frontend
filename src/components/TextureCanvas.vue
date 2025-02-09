@@ -7,9 +7,13 @@
                 📁 Choose File
             </label>
             <button @click="submitTextures" class="custom-file-upload">
-                Submit Textures
+                Submit Textures {{ this.textureProperties[this.currentTextureIndex] }}
             </button>
         </div>
+        {{ R }}
+        {{ G }}
+        {{ B }}
+        {{ A }}
         <div class="texture-editor">
             <div class="texture-list">
                 <!-- Iterate over the textures array so only valid textures are listed -->
@@ -28,6 +32,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 
 export default {
     name: 'TextureCanvas',
@@ -39,15 +45,35 @@ export default {
         MaterialProperties: {
             type: Object,
             required: true
+        },
+        R: {
+            type: Number,
+            required: true
+        },
+        G: {
+            type: Number,
+            required: true
+        },
+        B: {
+            type: Number,
+            required: true
+        },
+        A: {
+            type: Number,
+            required: true
         }
     },
     data() {
         return {
+            url: "http://localhost:5053",
             isDrawing: false,
             currentTextureIndex: 0,
             textures: Array(128).fill().map(() =>
                 new ImageData(128, 128)
             ),
+            texturesRGBA_Float32: Array(128).fill().map(() => ({
+                data : new Float32Array(128 * 128 * 4)
+            })),
             textureProperties: Array(128).fill().map(() => ({
                 reflection: 0.5,
                 directToScatter: 0.5,
@@ -72,15 +98,34 @@ export default {
             handler(newVal) {
                 console.log('Material Properties updated:', newVal);
                 this.textureProperties[this.currentTextureIndex] = newVal;
-                this.submitTextures(); // Optional: auto-submit when properties change
             },
             deep: true
         }
     },
     methods: {
-        submitTextures() {
-            console.log('Selected Textures:', this.textures[this.currentTextureIndex]);
+        async submitTextures() {
+            console.log('Selected Textures:', this.texturesRGBA_Float32[this.currentTextureIndex].data);
             console.log('Selected Color:', this.MaterialProperties);
+            const data = {
+                textures: this.texturesRGBA_Float32[this.currentTextureIndex],
+                reflection : Number(this.MaterialProperties.reflection),
+                directToScatter : Number(this.MaterialProperties.directToScatter),
+                roughness : Number(this.MaterialProperties.roughness),
+                metallic : Number(this.MaterialProperties.metallic),
+                index: Number(this.currentTextureIndex)
+            };
+
+            console.log('Submitting Textures...', data);
+
+            axios.post(`${this.url}/submitTextures`, data)
+                .then((response) => {
+                    console.log(response.data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            
+            console.log('Textures submitted');
         },
         selectTexture(index) {
             if (index < 0 || index >= this.textures.length) {
@@ -136,6 +181,21 @@ export default {
             const x = Math.floor((e.clientX - rect.left) / this.pixelSize);
             const y = Math.floor((e.clientY - rect.top) / this.pixelSize);
 
+            // set color in TextureFloat32Array
+            for (let by = 0; by < this.brushSize; by++) {
+                for (let bx = 0; bx < this.brushSize; bx++) {
+                    const px = x + bx;
+                    const py = y + by;
+                    if (px >= 0 && px < 128 && py >= 0 && py < 128) {
+                        const index = (py * 128 + px) * 4;
+                        this.texturesRGBA_Float32[this.currentTextureIndex].data[index] = this.R;
+                        this.texturesRGBA_Float32[this.currentTextureIndex].data[index + 2] = this.B;
+                        this.texturesRGBA_Float32[this.currentTextureIndex].data[index + 1] = this.G;
+                        this.texturesRGBA_Float32[this.currentTextureIndex].data[index + 3] = this.A;
+                    }
+                }
+            }
+
             // Draw with brush size
             for (let by = 0; by < this.brushSize; by++) {
                 for (let bx = 0; bx < this.brushSize; bx++) {
@@ -179,6 +239,12 @@ export default {
 
                 // Update current texture
                 this.textures[this.currentTextureIndex] = imageData;
+
+                // copy image data to Float32Array
+                for (let i = 0; i < imageData.data.length; i++) {
+                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i] = imageData.data[i];
+                }
+
                 this.loadTexture(this.currentTextureIndex);
 
                 // Cleanup
