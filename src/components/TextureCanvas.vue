@@ -89,6 +89,13 @@ export default {
                 roughness: 0.5,
                 metallic: 0.5,
             })),
+            normals: Array(128).fill().map(() => ({
+                data: new Float32Array(128 * 128 * 4)
+            })
+            ),
+            normalsImage: Array(128).fill().map(() =>
+                new ImageData(128, 128)
+            ),
             ctx: null,
             pixelSize: 4, // 512/128 = 4 pixels per grid cell
             brushSize: 1, // Add brush size
@@ -97,10 +104,15 @@ export default {
         };
     },
     mounted() {
-        const canvas = this.$refs.canvas;
-        this.ctx = canvas.getContext('2d');
+        this.ctxNormal = this.$refs.normalPreview.getContext('2d');
+        this.ctx = this.$refs.canvas.getContext('2d');
         this.drawGrid();
         this.loadTexture(0);
+        // this.drawGrid();
+        // this.loadTexture(0);
+
+        console.log("ctx", this.ctx);
+        console.log("ctxNormal", this.ctxNormal);
     },
     watch: {
         MaterialProperties: {
@@ -117,11 +129,13 @@ export default {
             console.log('Selected Color:', this.MaterialProperties);
             const data = {
                 textures: this.texturesRGBA_Float32[this.currentTextureIndex],
+                normals: this.normals[this.currentTextureIndex],
                 reflection: Number(this.MaterialProperties.reflection),
                 directToScatter: Number(this.MaterialProperties.directToScatter),
                 roughness: Number(this.MaterialProperties.roughness),
                 metallic: Number(this.MaterialProperties.metallic),
-                index: Number(this.currentTextureIndex)
+                index: Number(this.currentTextureIndex),
+                normal : this.normalsImage[this.currentTextureIndex]
             };
 
             console.log('Submitting Textures...', data);
@@ -146,6 +160,8 @@ export default {
         },
         loadTexture(index) {
             this.ctx.putImageData(this.textures[index], 0, 0);
+            this.drawGrid();
+            this.ctxNormal.putImageData(this.normalsImage[index], 0, 0);
             this.drawGrid();
         },
         drawGrid() {
@@ -279,11 +295,14 @@ export default {
 
                 // Convert to normal map format and store
                 for (let i = 0; i < imageData.data.length; i += 4) {
-                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i] = imageData.data[i];     // R
-                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1]; // G
-                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2]; // B
-                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3]; // A
+                    this.normals[this.currentTextureIndex].data[i] = imageData.data[i] / 255 - 128;     // R
+                    this.normals[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1] / 255 - 128; // G
+                    this.normals[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2] / 255 - 128; // B
+                    this.normals[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3] / 255 - 128; // A
                 }
+
+                // save image into noramlsImage
+                this.normalsImage[this.currentTextureIndex] = imageData;
 
                 URL.revokeObjectURL(img.src);
             };
