@@ -116,8 +116,7 @@ export default {
 
 <style scoped>
 .color-preview-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: inline;
   align-items: center;
   gap: var(--spacing-unit);
 }
@@ -170,7 +169,6 @@ button:hover {
 }
 
 .color-preview {
-  padding: 100px;
   height: 50px;
   border-radius: var(--border-radius);
   margin: var(--spacing-unit) 0;

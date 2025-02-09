@@ -12,12 +12,7 @@
             <!-- Add normal map upload -->
             <label class="custom-file-upload">
                 Upload Normals
-                <input 
-                    type="file" 
-                    accept="image/*" 
-                    @change="handleNormalMapUpload"
-                    ref="normalMapInput"
-                >
+                <input type="file" accept="image/*" @change="handleNormalMapUpload" ref="normalMapInput">
             </label>
             <button @click="openNormalMapGenerator" class="custom-file-upload">
                 No normals visit
@@ -36,15 +31,11 @@
                 <canvas ref="canvas" width="128" height="128" @mousedown="startDrawing" @mousemove="draw"
                     @mouseup="stopDrawing" @mouseleave="stopDrawing" @wheel="handleWheel"></canvas>
             </div>
-        </div>
-        <!-- Add preview canvases -->
-        <div class="preview-container">
-            <canvas 
-                ref="normalPreview" 
-                width="128" 
-                height="128" 
-                class="preview-canvas"
-            ></canvas>
+
+            <!-- Add preview canvases -->
+            <div class="canvas-container">
+                <canvas ref="normalPreview" width="128" height="128" class="preview-canvas"></canvas>
+            </div>
         </div>
     </div>
 </template>
@@ -90,7 +81,7 @@ export default {
                 new ImageData(128, 128)
             ),
             texturesRGBA_Float32: Array(128).fill().map(() => ({
-                data : new Float32Array(128 * 128 * 4)
+                data: new Float32Array(128 * 128 * 4)
             })),
             textureProperties: Array(128).fill().map(() => ({
                 reflection: 0.5,
@@ -126,10 +117,10 @@ export default {
             console.log('Selected Color:', this.MaterialProperties);
             const data = {
                 textures: this.texturesRGBA_Float32[this.currentTextureIndex],
-                reflection : Number(this.MaterialProperties.reflection),
-                directToScatter : Number(this.MaterialProperties.directToScatter),
-                roughness : Number(this.MaterialProperties.roughness),
-                metallic : Number(this.MaterialProperties.metallic),
+                reflection: Number(this.MaterialProperties.reflection),
+                directToScatter: Number(this.MaterialProperties.directToScatter),
+                roughness: Number(this.MaterialProperties.roughness),
+                metallic: Number(this.MaterialProperties.metallic),
                 index: Number(this.currentTextureIndex)
             };
 
@@ -142,7 +133,7 @@ export default {
                 .catch((error) => {
                     console.error(error);
                 });
-            
+
             console.log('Textures submitted');
         },
         selectTexture(index) {
@@ -285,13 +276,13 @@ export default {
 
                 // Get image data
                 const imageData = ctx.getImageData(0, 0, 128, 128);
-                
+
                 // Convert to normal map format and store
                 for (let i = 0; i < imageData.data.length; i += 4) {
                     this.texturesRGBA_Float32[this.currentTextureIndex].data[i] = imageData.data[i];     // R
-                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i+1] = imageData.data[i+1]; // G
-                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i+2] = imageData.data[i+2]; // B
-                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i+3] = imageData.data[i+3]; // A
+                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1]; // G
+                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2]; // B
+                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3]; // A
                 }
 
                 URL.revokeObjectURL(img.src);
@@ -397,16 +388,8 @@ canvas {
     display: none;
 }
 
-.preview-container {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    justify-content: center;
-}
-
 .preview-canvas {
     border: 1px solid var(--border-color);
     background: var(--bg-tertiary);
 }
 </style>
-
