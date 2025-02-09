@@ -9,11 +9,20 @@
             <button @click="submitTextures" class="custom-file-upload">
                 Submit Textures {{ this.textureProperties[this.currentTextureIndex] }}
             </button>
+            <!-- Add normal map upload -->
+            <label class="custom-file-upload">
+                Upload Normals
+                <input 
+                    type="file" 
+                    accept="image/*" 
+                    @change="handleNormalMapUpload"
+                    ref="normalMapInput"
+                >
+            </label>
+            <button @click="openNormalMapGenerator" class="custom-file-upload">
+                No normals visit
+            </button>
         </div>
-        {{ R }}
-        {{ G }}
-        {{ B }}
-        {{ A }}
         <div class="texture-editor">
             <div class="texture-list">
                 <!-- Iterate over the textures array so only valid textures are listed -->
@@ -27,6 +36,15 @@
                 <canvas ref="canvas" width="128" height="128" @mousedown="startDrawing" @mousemove="draw"
                     @mouseup="stopDrawing" @mouseleave="stopDrawing" @wheel="handleWheel"></canvas>
             </div>
+        </div>
+        <!-- Add preview canvases -->
+        <div class="preview-container">
+            <canvas 
+                ref="normalPreview" 
+                width="128" 
+                height="128" 
+                class="preview-canvas"
+            ></canvas>
         </div>
     </div>
 </template>
@@ -250,6 +268,37 @@ export default {
                 // Cleanup
                 URL.revokeObjectURL(img.src);
             };
+        },
+        async handleNormalMapUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+
+            img.onload = () => {
+                const previewCanvas = this.$refs.normalPreview;
+                const ctx = previewCanvas.getContext('2d');
+
+                // Draw and scale image
+                ctx.drawImage(img, 0, 0, 128, 128);
+
+                // Get image data
+                const imageData = ctx.getImageData(0, 0, 128, 128);
+                
+                // Convert to normal map format and store
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i] = imageData.data[i];     // R
+                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i+1] = imageData.data[i+1]; // G
+                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i+2] = imageData.data[i+2]; // B
+                    this.texturesRGBA_Float32[this.currentTextureIndex].data[i+3] = imageData.data[i+3]; // A
+                }
+
+                URL.revokeObjectURL(img.src);
+            };
+        },
+        openNormalMapGenerator() {
+            window.open('https://cpetry.github.io/NormalMap-Online/', '_blank');
         }
     }
 };
@@ -346,6 +395,18 @@ canvas {
 .image-upload input[type="file"],
 .image-upload::before {
     display: none;
+}
+
+.preview-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: center;
+}
+
+.preview-canvas {
+    border: 1px solid var(--border-color);
+    background: var(--bg-tertiary);
 }
 </style>
 
