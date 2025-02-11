@@ -135,7 +135,8 @@ export default {
                 roughness: Number(this.MaterialProperties.roughness),
                 metallic: Number(this.MaterialProperties.metallic),
                 index: Number(this.currentTextureIndex),
-                normal : this.normalsImage[this.currentTextureIndex]
+                normal : this.normalsImage[this.currentTextureIndex],
+                specular : Number(this.MaterialProperties.specular),
             };
 
             console.log('Submitting Textures...', data);
