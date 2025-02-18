@@ -36,6 +36,29 @@
             <div class="canvas-container">
                 <canvas ref="normalPreview" width="128" height="128" class="preview-canvas"></canvas>
             </div>
+
+            <div class="material-properties">
+                <div class="property-card">
+                  <div class="property-label">Reflection</div>
+                  <div class="property-value">{{ textureProperties[currentTextureIndex].reflection }}</div>
+                </div>
+                <div class="property-card">
+                  <div class="property-label">Direct to Scatter</div>
+                  <div class="property-value">{{ textureProperties[currentTextureIndex].directToScatter }}</div>
+                </div>
+                <div class="property-card">
+                  <div class="property-label">Roughness</div>
+                  <div class="property-value">{{ textureProperties[currentTextureIndex].roughness }}</div>
+                </div>
+                <div class="property-card">
+                  <div class="property-label">Metallic</div>
+                  <div class="property-value">{{ textureProperties[currentTextureIndex].metallic }}</div>
+                </div>
+                <div class="property-card">
+                    <div class="property-label">Specular</div>
+                    <div class="property-value">{{ textureProperties[currentTextureIndex].specular }}</div>
+                  </div>
+              </div>
         </div>
     </div>
 </template>
@@ -88,6 +111,7 @@ export default {
                 directToScatter: 0.5,
                 roughness: 0.5,
                 metallic: 0.5,
+                specular: 0.5
             })),
             normals: Array(128).fill().map(() => ({
                 data: new Float32Array(128 * 128 * 4)
@@ -316,6 +340,47 @@ export default {
 </script>
 
 <style scoped>
+.material-properties {
+    display: grid;
+    gap: 8px;
+    padding: var(--spacing-unit);
+    background: var(--bg-tertiary);
+    border-radius: var(--border-radius);
+    min-width: 200px;
+  }
+  
+  .property-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border-radius: calc(var(--border-radius) * 0.5);
+    transition: transform 0.2s ease;
+    border: 1px solid var(--border-color);
+  }
+  
+  .property-card:hover {
+    transform: translateX(4px);
+    background: var(--bg-tertiary);
+  }
+  
+  .property-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  .property-value {
+    background: linear-gradient(135deg, var(--accent-primary), #3a8eef);
+    padding: 4px 8px;
+    border-radius: calc(var(--border-radius) * 0.5);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    min-width: 50px;
+    text-align: center;
+  }
+
 .texture-editor {
     display: flex;
     gap: var(--spacing-unit);

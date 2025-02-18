@@ -86,7 +86,7 @@ export default {
         directToScatter: this.sliders[1].value.toFixed(2),
         roughness: this.sliders[2].value.toFixed(2),
         metallic: this.sliders[3].value.toFixed(2),
-        specular: this.sliders[3].value.toFixed(2:
+        specular: this.sliders[4].value.toFixed(2),
       };
     },
   },
