@@ -218,7 +218,7 @@ export default {
             });
             console.log(shaderMenu);
             axios
-                .post(`${this.apiAddress}/shader-menu`, shaderMenu)
+                .post(`${this.apiAddress}/submitShader`, shaderMenu)
                 .then((response) => {
                     console.log(response.data);
                 })
