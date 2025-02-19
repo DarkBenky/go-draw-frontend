@@ -58,7 +58,7 @@
                     <div class="property-label">Specular</div>
                     <div class="property-value">{{ textureProperties[currentTextureIndex].specular }}</div>
                   </div>
-              </div>
+              </div>  
         </div>
     </div>
 </template>
@@ -93,7 +93,7 @@ export default {
         A: {
             type: Number,
             required: true
-        }
+        },
     },
     data() {
         return {
@@ -145,12 +145,15 @@ export default {
                 this.textureProperties[this.currentTextureIndex] = newVal;
             },
             deep: true
-        }
+        },
     },
     methods: {
+
         async submitTextures() {
             console.log('Selected Textures:', this.texturesRGBA_Float32[this.currentTextureIndex].data);
             console.log('Selected Color:', this.MaterialProperties);
+            // let texture = this.updateTextureMultiplayer();
+            // console.log('Texture:', texture);
             const data = {
                 textures: this.texturesRGBA_Float32[this.currentTextureIndex],
                 normals: this.normals[this.currentTextureIndex],
@@ -161,6 +164,10 @@ export default {
                 index: Number(this.currentTextureIndex),
                 normal : this.normalsImage[this.currentTextureIndex],
                 specular : Number(this.MaterialProperties.specular),
+                ColorR : Number(this.MaterialProperties.R),
+                ColorG : Number(this.MaterialProperties.G),
+                ColorB : Number(this.MaterialProperties.B),
+                ColorA : Number(this.MaterialProperties.A)
             };
 
             console.log('Submitting Textures...', data);

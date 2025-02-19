@@ -27,7 +27,8 @@
         :R="this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier"
         :G="this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier"
         :B="this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier"
-        :A="this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier" />
+        :A="this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier"
+       />
     </div>
 
     <!-- Additional Settings -->
@@ -35,7 +36,8 @@
     <div class="sliders-v2">
       <div v-for="slider in sliders" :key="slider.name" class="slider-v2">
         <label :for="slider.name">{{ slider.name }}:</label>
-        <input type="range" :id="slider.name" v-model.number="slider.value" min="0" max="1" step="0.01" />
+        <input v-if="slider.t == 'multiplier'" type="range" :id="slider.name" v-model.number="slider.value" min="0" max="128" step="0.01" />
+        <input v-else type="range" :id="slider.name" v-model.number="slider.value" min="0" max="1" step="0.01" />
         <span>{{ slider.value.toFixed(2) }}</span>
       </div>
     </div>
@@ -61,11 +63,15 @@ export default {
         { name: "A", value: 0, multiplier: 1 },
       ],
       sliders: [
-        { name: "Reflection", value: 0.5 },
-        { name: "Direct to Scatter", value: 0.5 },
-        { name: "Roughness", value: 0.5 },
-        { name: "Metallic", value: 0.5 },
-        { name: "Specular", value: 0.5 },
+        { name: "Reflection", value: 0.5 , t: "normal"},
+        { name: "Direct to Scatter", value: 0.5 , t: "normal"},
+        { name: "Roughness", value: 0.5 , t: "normal"},
+        { name: "Metallic", value: 0.5 , t: "normal"},
+        { name: "Specular", value: 0.5, t: "normal" },
+        { name: "Red Channel Multiplayer", value: 1 , t: "multiplier"},
+        { name: "Green Channel Multiplayer", value: 1, t: "multiplier" },
+        { name: "Blue Channel Multiplayer", value: 1, t: "multiplier" },
+        { name: "Alpha Channel Multiplayer", value: 1, t: "multiplier" },
       ],
     };
   },
@@ -87,6 +93,10 @@ export default {
         roughness: this.sliders[2].value.toFixed(2),
         metallic: this.sliders[3].value.toFixed(2),
         specular: this.sliders[4].value.toFixed(2),
+        R: this.sliders[5].value.toFixed(2),
+        G: this.sliders[6].value.toFixed(2),
+        B: this.sliders[7].value.toFixed(2),
+        A: this.sliders[8].value.toFixed(2),
       };
     },
   },
