@@ -162,7 +162,7 @@ export default {
                 roughness: Number(this.MaterialProperties.roughness),
                 metallic: Number(this.MaterialProperties.metallic),
                 index: Number(this.currentTextureIndex),
-                normal : this.normalsImage[this.currentTextureIndex],
+                // normal : this.normalsImage[this.currentTextureIndex],
                 specular : Number(this.MaterialProperties.specular),
                 ColorR : Number(this.MaterialProperties.R),
                 ColorG : Number(this.MaterialProperties.G),
@@ -327,10 +327,10 @@ export default {
 
                 // Convert to normal map format and store
                 for (let i = 0; i < imageData.data.length; i += 4) {
-                    this.normals[this.currentTextureIndex].data[i] = imageData.data[i] / 255;     // R
-                    this.normals[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1] / 255; // G
-                    this.normals[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2] / 255; // B
-                    this.normals[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3] / 255; // A
+                    this.normals[this.currentTextureIndex].data[i] = ((imageData.data[i] / 255 )- 0.5) * 2;     // R
+                    this.normals[this.currentTextureIndex].data[i + 1] = ((imageData.data[i + 1] / 255)- 0.5) * 2; // G
+                    this.normals[this.currentTextureIndex].data[i + 2] = ((imageData.data[i + 2] / 255)- 0.5) * 2; // B
+                    this.normals[this.currentTextureIndex].data[i + 3] = ((imageData.data[i + 3] / 255)- 0.5) * 2; // A
                 }
 
                 // save image into noramlsImage
