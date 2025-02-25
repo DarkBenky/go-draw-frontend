@@ -327,10 +327,10 @@ export default {
 
                 // Convert to normal map format and store
                 for (let i = 0; i < imageData.data.length; i += 4) {
-                    this.normals[this.currentTextureIndex].data[i] = ((imageData.data[i] / 255 )- 0.5) * 2;     // R
-                    this.normals[this.currentTextureIndex].data[i + 1] = ((imageData.data[i + 1] / 255)- 0.5) * 2; // G
-                    this.normals[this.currentTextureIndex].data[i + 2] = ((imageData.data[i + 2] / 255)- 0.5) * 2; // B
-                    this.normals[this.currentTextureIndex].data[i + 3] = ((imageData.data[i + 3] / 255)- 0.5) * 2; // A
+                    this.normals[this.currentTextureIndex].data[i] = imageData.data[i] / 127 - 1;     // R
+                    this.normals[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1] / 127 - 1; // G
+                    this.normals[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2] / 127 - 1; // B
+                    this.normals[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3] / 127 - 1; // A
                 }
 
                 // save image into noramlsImage

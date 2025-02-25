@@ -84,6 +84,24 @@
                 </div>
             </template>
 
+            <template v-if="selectedShader.type === 'bloomV2'">
+                <div class="control-group">
+                    <label>Threshold:</label>
+                    <input type="range" v-model.number="selectedShader.BloomThreshold" min="0" max="1" step="0.01" />
+                    <span>{{ selectedShader.BloomThreshold.toFixed(2) }}</span>
+                </div>
+                <div class="control-group">
+                    <label>Intensity:</label>
+                    <input type="range" v-model.number="selectedShader.BloomIntensity" min="0" max="2" step="0.1" />
+                    <span>{{ selectedShader.BloomIntensity.toFixed(2) }}</span>
+                </div>
+                <div class="control-group">
+                    <label>Spread:</label>
+                    <input type="range" v-model.number="selectedShader.BloomSpread" min="0" max="3" step="0.01" />
+                    <span>{{ selectedShader.BloomSpread.toFixed(2) }}</span>
+                </div>
+            </template>
+
             <template v-if="selectedShader.type === 'sharpen'">
                 <div class="control-group">
                     <label>Sharpness:</label>
@@ -136,6 +154,13 @@ export default {
                     amount: 0.1,
                     multipass: 3,
                 },
+                bloomV2: {
+                    BloomThreshold: 0.05,
+                    BloomIntensity: 1.1,
+                    BloomSpread: 0.7,
+                    amount: 0.1,
+                    multipass: 3,
+                },
                 sharpen: {
                     Sharpness: 1.0,
                     amount: 0.1,
@@ -146,6 +171,7 @@ export default {
                     ColorG :16,
                     ColorB :16,
                     amount: 0.1,
+                    multipass: 1,
                 },
             },
             selectedType: "contrast",
