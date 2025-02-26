@@ -110,6 +110,37 @@
                 </div>
             </template>
 
+            <template v-if="selectedShader.type === 'chromaticAberration'">
+                <div class="control-group">
+                    <label>Strength:</label>
+                    <input type="range" v-model.number="selectedShader.Strength" min="0" max="1" step="0.01" />
+                    <span>{{ selectedShader.Strength.toFixed(3) }}</span>
+                </div>
+            </template>
+
+            <template v-if="selectedShader.type === 'edgeDetection'">
+                <div class="control-group">
+                    <label>Strength:</label>
+                    <input type="range" v-model.number="selectedShader.Strength" min="0" max="1" step="0.01" />
+                    <span>{{ selectedShader.Strength.toFixed(3) }}</span>
+                </div>
+                <div class="control-group">
+                    <label>Alpha R:</label>
+                    <input type="range" v-model.number="selectedShader.AlphaR" min="0" max="1" step="0.01" />
+                    <span>{{ selectedShader.AlphaR.toFixed(4) }}</span>
+                </div>
+                <div class="control-group">
+                    <label>Alpha G:</label>
+                    <input type="range" v-model.number="selectedShader.AlphaG" min="0" max="1" step="0.01" />
+                    <span>{{ selectedShader.AlphaG.toFixed(4) }}</span>
+                </div>
+                <div class="control-group">
+                    <label>Alpha B:</label>
+                    <input type="range" v-model.number="selectedShader.AlphaB" min="0" max="1" step="0.01" />
+                    <span>{{ selectedShader.AlphaB.toFixed(4) }}</span>
+                </div>
+            </template>
+
             <template v-if="selectedShader.type === 'colorMapping'">
                 <div class="control-group">
                     <label>Color R:</label>
@@ -122,6 +153,29 @@
                 <div class="control-group">
                     <label>Color B:</label>
                     <input type="number" v-model.number="selectedShader.ColorB" min="0" max="255" />
+                </div>
+            </template>
+
+            <template v-if="selectedShader.type === 'colorMappingV2'">
+                <div class="control-group">
+                    <label>Color R:</label>
+                    <input type="number" v-model.number="selectedShader.ColorR" min="0" max="255" />
+                </div>
+                <div class="control-group">
+                    <label>Color G:</label>
+                    <input type="number" v-model.number="selectedShader.ColorG" min="0" max="255" />
+                </div>
+                <div class="control-group">
+                    <label>Color B:</label>
+                    <input type="number" v-model.number="selectedShader.ColorB" min="0" max="255" />
+                </div>
+            </template>
+
+            <template v-if="selectedShader.type === 'Lighten'">
+                <div class="control-group">
+                    <label>Lighten/Darken:</label>
+                    <input type="range" v-model.number="selectedShader.Lighten" min="0" max="2.5" step="0.1" />
+                    <span>{{ selectedShader.Lighten.toFixed(2) }}</span>
                 </div>
             </template>
         </div>
@@ -170,6 +224,33 @@ export default {
                     ColorR :16,
                     ColorG :16,
                     ColorB :16,
+                    amount: 0.1,
+                    multipass: 1,
+                },
+                chromaticAberration :
+                {   
+                    Strength: 0.1,
+                    amount: 0.1,
+                    multipass: 1,
+                },
+                edgeDetection :
+                {
+                    amount: 0.1,
+                    multipass: 1,
+                    Strength: 0.1,
+                    AlphaR: 1.0,
+                    AlphaG: 1.0,
+                    AlphaB: 1.0,
+                },
+                // colorMappingV2: {
+                //     ColorR :2,
+                //     ColorG :2,
+                //     ColorB :2,
+                //     amount: 0.1,
+                //     multipass: 1,
+                // },
+                Lighten: {
+                    Lighten: 0.1,
                     amount: 0.1,
                     multipass: 1,
                 },
@@ -242,6 +323,19 @@ export default {
                 delete params.id;
                 return { type, params };
             });
+
+            for (let i = 0; i < shaderMenu.length; i++) {
+                if (shaderMenu[i].type === "chromaticAberration") {
+                    shaderMenu[i].params.Strength = parseFloat(shaderMenu[i].params.Strength) / 1000;
+                }
+                if (shaderMenu[i].type === "edgeDetection") {
+                    shaderMenu[i].params.AlphaR = parseFloat(shaderMenu[i].params.AlphaR);
+                    shaderMenu[i].params.AlphaG = parseFloat(shaderMenu[i].params.AlphaG);
+                    shaderMenu[i].params.AlphaB = parseFloat(shaderMenu[i].params.AlphaB);
+                    shaderMenu[i].params.Strength = parseFloat(shaderMenu[i].params.Strength) / 1000;
+                }
+            }
+
             console.log(shaderMenu);
             axios
                 .post(`${this.apiAddress}/submitShader`, shaderMenu)
