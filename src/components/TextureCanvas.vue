@@ -238,13 +238,17 @@ export default {
             const x = Math.floor((e.clientX - rect.left) / this.pixelSize);
             const y = Math.floor((e.clientY - rect.top) / this.pixelSize);
 
+            const x1 = Math.floor((e.clientX - rect.left) );
+            const y1 = Math.floor((e.clientY - rect.top) );
+
             // set color in TextureFloat32Array
             for (let by = 0; by < this.brushSize; by++) {
                 for (let bx = 0; bx < this.brushSize; bx++) {
-                    const px = x + bx;
-                    const py = y + by;
+                    const px = x1 + bx;
+                    const py = y1 + by;
                     if (px >= 0 && px < 128 && py >= 0 && py < 128) {
                         const index = (py * 128 + px) * 4;
+                        console.log('x:', x, 'y:', y, 'index:', index);
                         this.texturesRGBA_Float32[this.currentTextureIndex].data[index] = this.R;
                         this.texturesRGBA_Float32[this.currentTextureIndex].data[index + 2] = this.B;
                         this.texturesRGBA_Float32[this.currentTextureIndex].data[index + 1] = this.G;
@@ -256,13 +260,13 @@ export default {
             // Draw with brush size
             for (let by = 0; by < this.brushSize; by++) {
                 for (let bx = 0; bx < this.brushSize; bx++) {
-                    const px = x + bx;
-                    const py = y + by;
+                    const px = x1 + bx;
+                    const py = y1 + by;
                     if (px >= 0 && px < 128 && py >= 0 && py < 128) {
                         this.ctx.fillStyle = this.selectedColor;
                         this.ctx.fillRect(
-                            px * this.pixelSize,
-                            py * this.pixelSize,
+                            px,
+                            py,
                             this.pixelSize,
                             this.pixelSize
                         );
