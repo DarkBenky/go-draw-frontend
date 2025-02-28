@@ -22,11 +22,23 @@
           </div>
         </div>
 
+        <!-- Sliders Section -->
+        <h4>Lighting Parameters</h4>
+        <div class="slider-with-input" v-for="slider in sliders" :key="slider.name">
+          <label>{{slider.name}}</label>
+          <div class="controls">
+            <input v-if="slider.name=='Light Intensity'" type="range" v-model="slider.value" min="0" max="32" step="0.1" />
+            <input v-else type="range" v-model="slider.value" min="0" max="256" step="1" />
+            <input type="number" v-model="slider.value" class="number-input" />
+          </div>
+        </div>
+
+
         <h4>Field of View</h4>
         <div class="slider-with-input">
           <label>FOV</label>
           <div class="controls">
-            <input type="range" v-model.number="FOV" min="30" max="120" step="1" />
+            <input type="range" v-model.number="FOV" min="15" max="120" step="1" />
             <input type="number" v-model.number="FOV" class="number-input" />
           </div>
         </div>
@@ -111,12 +123,18 @@ export default {
       ],
       FOV: 90,
       resolution: "Native",
-      resolutions: ["Native", "2x", "4x", "8x"],
+      resolutions: ["Native", "2X", "4X", "8X"],
       selectedMode: 'Classic',
       modes: ["Classic", "Normals", "Depth"],
       renderVersion: "V2",
       renderVersions: ["V1", "V2", "V2-Log", "V2-Linear", "V2-Linear-Texture", "V2-Log-Texture", "V4-Log", "V4-Linear", "V4-Log-Optim", "V4-Linear-Optim"],
       gamma: 0.25,
+      sliders: [
+        { name: "Light Intensity", value: 3 },
+        { name: "R", value: 1 },
+        { name: "G", value: 1 },
+        { name: "B", value: 1 },
+      ],
     };
   },
   methods: {
@@ -145,6 +163,10 @@ export default {
         version: this.renderVersion,
         mode: this.selectedMode,
         fov: this.FOV,
+        lightIntensity: Number(this.sliders[0].value),
+        r: Number(this.sliders[1].value),
+        g: Number(this.sliders[2].value),
+        b: Number(this.sliders[3].value),
       };
       axios
         .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)

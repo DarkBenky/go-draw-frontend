@@ -22,6 +22,17 @@
           <option value="true">True</option>
         </select>
       </div>
+
+      <!-- Render Voxels Select -->
+      <div class="randomness-select">
+        <label>OverWrite Voxels</label>
+        <select v-model="overWriteVoxel">
+          <option value="false">False</option>
+          <option value="true">True</option>
+        </select>
+      </div>
+
+      
   
       <!-- Add after randomness select -->
       <div class="randomness-control" v-if="colorRandomnessVoxel === 'random'">
@@ -242,6 +253,7 @@
         randomnessScaleVoxel : 10,
         renderVolume : false,
         renderVoxel : false,
+        overWriteVoxel : false
       };
     },
     computed: {
@@ -289,7 +301,8 @@
           randomness: this.colorRandomness === "random" ? this.randomnessScale : 0,
           randomnessVoxel: this.colorRandomnessVoxel === "random" ? this.randomnessScaleVoxel : 0,
           renderVolume: this.renderVolume === "true", // Convert to boolean
-          renderVoxel: this.renderVoxel === "true"    // Convert to boolean
+          renderVoxel: this.renderVoxel === "true",    // Convert to boolean
+          overWriteVoxel: this.overWriteVoxel === "true"    // Convert to boolean
         };
       
         axios
