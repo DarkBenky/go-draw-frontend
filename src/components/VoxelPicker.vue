@@ -32,6 +32,29 @@
         </select>
       </div>
 
+      <!-- Render Voxels Select -->
+      <div class="randomness-select">
+        <label>Voxel Modification</label>
+        <select v-model="voxelModification">
+          <option value="draw">Draw</option>
+          <option value="erase">Erase</option>
+          <option value="add">Add</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <!-- Render Voxels Select -->
+      <div v-if="voxelModification == 'add'" class="randomness-select">
+        <label>Add Direction</label>
+        <select v-model="addDirection">
+          <option value="front">Front</option>
+          <option value="back">Back</option>
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+          <option value="top">Top</option>
+          <option value="bottom">Bottom</option>
+        </select>
+      </div>
       
   
       <!-- Add after randomness select -->
@@ -253,7 +276,9 @@
         randomnessScaleVoxel : 10,
         renderVolume : false,
         renderVoxel : false,
-        overWriteVoxel : false
+        overWriteVoxel : false,
+        voxelModification : "draw",
+        addDirection: "front",
       };
     },
     computed: {
@@ -302,7 +327,9 @@
           randomnessVoxel: this.colorRandomnessVoxel === "random" ? this.randomnessScaleVoxel : 0,
           renderVolume: this.renderVolume === "true", // Convert to boolean
           renderVoxel: this.renderVoxel === "true",    // Convert to boolean
-          overWriteVoxel: this.overWriteVoxel === "true"    // Convert to boolean
+          overWriteVoxel: this.overWriteVoxel === "true",    // Convert to boolean
+          voxelModification: this.voxelModification,
+          addDirection: this.addDirection,
         };
       
         axios
