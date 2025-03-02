@@ -44,15 +44,20 @@
       </div>
 
       <!-- Render Voxels Select -->
-      <div v-if="voxelModification == 'add'" class="randomness-select">
-        <label>Add Direction</label>
-        <select v-model="addDirection">
-          <option value="front">Front</option>
-          <option value="back">Back</option>
-          <option value="left">Left</option>
-          <option value="right">Right</option>
-          <option value="top">Top</option>
-          <option value="bottom">Bottom</option>
+      <div v-if="voxelModification != 'none'" class="randomness-select">
+        <label>Add Use Randomness For Painting</label>
+        <select v-model="UseRandomnessPaint">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <!-- Render Voxels Select -->
+      <div class="randomness-select">
+        <label>Convert Voxels To Smoke</label>
+        <select v-model="convertVoxelsToSmoke">
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
         </select>
       </div>
       
@@ -278,7 +283,8 @@
         renderVoxel : false,
         overWriteVoxel : false,
         voxelModification : "draw",
-        addDirection: "front",
+        UseRandomnessPaint: "yes",
+        convertVoxelsToSmoke: 'no',
       };
     },
     computed: {
@@ -329,7 +335,8 @@
           renderVoxel: this.renderVoxel === "true",    // Convert to boolean
           overWriteVoxel: this.overWriteVoxel === "true",    // Convert to boolean
           voxelModification: this.voxelModification,
-          addDirection: this.addDirection,
+          useRandomnessForPaint: this.UseRandomnessPaint === "yes",    // Convert to boolean\
+          convertVoxelsToSmoke: this.convertVoxelsToSmoke === 'yes',
         };
       
         axios
