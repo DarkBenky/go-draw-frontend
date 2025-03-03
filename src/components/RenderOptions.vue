@@ -2,9 +2,53 @@
   <div class="render-options">
     <h3>Render Options</h3>
 
-    <button @click="SubmitRenderOptions" class="btn">
-      Submit Render Options
-    </button>
+    <div class="button-group">
+      <button @click="SubmitRenderOptions" class="btn">
+        Submit Render Options
+      </button>
+
+      <button @click="GetCameraPosition" class="btn">
+        GetCameraPosition
+      </button>
+
+      <button @click="toggleCameraPosition" class="btn toggle-btn">
+        {{ showCameraPosition ? 'Hide Camera' : 'Show Camera' }}
+      </button>
+    </div>
+
+    <!-- Camera Positions with conditional rendering -->
+    <div v-if="showCameraPosition" class="camera-position-container">
+      <div v-for="cameraPosition in cameraPositions" :key="cameraPosition" class="camera-position-card">
+        <div class="position-group">
+          <div class="position-item">
+            <span class="position-label">X:</span>
+            <span class="position-value">{{cameraPosition.x.toFixed(2)}}</span>
+          </div>
+          <div class="position-item">
+            <span class="position-label">Y:</span>
+            <span class="position-value">{{cameraPosition.y.toFixed(2)}}</span>
+          </div>
+          <div class="position-item">
+            <span class="position-label">Z:</span>
+            <span class="position-value">{{cameraPosition.z.toFixed(2)}}</span>
+          </div>
+        </div>
+        <div class="axis-group">
+          <div class="position-item">
+            <span class="position-label">X-Axis:</span>
+            <span class="position-value">{{ cameraPosition.cameraX.toFixed(2)}}</span>
+          </div>
+          <div class="position-item">
+            <span class="position-label">Y-Axis:</span>
+            <span class="position-value">{{ cameraPosition.cameraY.toFixed(2)}}</span>
+          </div>
+        </div>
+        <button @click="moveToPosition(cameraPosition)" class="btn">
+          Move to Position
+        </button>
+        
+      </div>
+    </div>
 
     <div class="options-grid">
       <!-- Main Parameters Section -->
@@ -112,6 +156,7 @@ export default {
 
   data() {
     return {
+      showCameraPosition: true, // Add this line
       exponentialParams: [
         { name: "Depth", value: 3, actualValue: 8 },
         { name: "Scatter", value: 0, actualValue: 0 },
@@ -121,6 +166,7 @@ export default {
         { name: "Raymarching", value: "no" },
         { name: "Performance Mode", value: "no" },
       ],
+      cameraPositions : [],
       FOV: 90,
       resolution: "Native",
       resolutions: ["Native", "2X", "4X", "8X"],
@@ -138,6 +184,17 @@ export default {
     };
   },
   methods: {
+    moveToPosition(cameraPosition) {
+      axios
+        .post(`${this.apiAddress}/moveToPosition`, cameraPosition)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
     updateExponentialValue(param) {
       // if (param.value <= 1 ) {
       //   param.actualValue = 0;
@@ -150,6 +207,18 @@ export default {
     updateSliderValue(param) {
       param.value = Math.log2(param.actualValue);
     },
+    GetCameraPosition() {
+      axios
+        .get(`${this.apiAddress}/getCameraPosition`)
+        .then((response) => {
+          console.log(response.data);
+          this.cameraPositions.push(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
     SubmitRenderOptions() {
       console.log("Submitting render options...");
       const renderOptions = {
@@ -176,6 +245,9 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+    },
+    toggleCameraPosition() {
+      this.showCameraPosition = !this.showCameraPosition;
     },
   },
 };
@@ -320,4 +392,78 @@ label {
     align-items: center;
   }
 }
+
+/* Add these new styles */
+.button-group {
+  display: flex;
+  gap: var(--spacing-unit);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-unit);
+}
+
+.toggle-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--accent-primary);
+}
+
+.toggle-btn:hover {
+  background: var(--accent-primary);
+}
+
+.camera-position-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
+  animation: slideDown 0.3s ease-out;
+}
+
+.camera-position-card {
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-unit);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: grid;
+  gap: var(--spacing-unit);
+}
+
+.position-group, .axis-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
+.position-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+  border-radius: calc(var(--border-radius) * 0.5);
+}
+
+.position-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.position-value {
+  color: var(--accent-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ...existing styles... */
 </style>
