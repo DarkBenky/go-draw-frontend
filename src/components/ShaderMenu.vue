@@ -125,17 +125,17 @@
                     <span>{{ selectedShader.Strength.toFixed(3) }}</span>
                 </div>
                 <div class="control-group">
-                    <label>Alpha R:</label>
+                    <label>Color R:</label>
                     <input type="range" v-model.number="selectedShader.AlphaR" min="0" max="1" step="0.01" />
                     <span>{{ selectedShader.AlphaR.toFixed(4) }}</span>
                 </div>
                 <div class="control-group">
-                    <label>Alpha G:</label>
+                    <label>Color G:</label>
                     <input type="range" v-model.number="selectedShader.AlphaG" min="0" max="1" step="0.01" />
                     <span>{{ selectedShader.AlphaG.toFixed(4) }}</span>
                 </div>
                 <div class="control-group">
-                    <label>Alpha B:</label>
+                    <label>Color B:</label>
                     <input type="range" v-model.number="selectedShader.AlphaB" min="0" max="1" step="0.01" />
                     <span>{{ selectedShader.AlphaB.toFixed(4) }}</span>
                 </div>

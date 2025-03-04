@@ -115,7 +115,7 @@
             <label>Mode</label>
             <select v-model="selectedMode">
               <option v-for="mode in modes" :key="mode" :value="mode">
-                {{ mode }}
+                 {{ mode }}
               </option>
             </select>
           </div>
