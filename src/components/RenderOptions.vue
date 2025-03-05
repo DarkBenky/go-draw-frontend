@@ -8,45 +8,75 @@
       </button>
 
       <button @click="GetCameraPosition" class="btn">
-        GetCameraPosition
+        Get Camera Position
+      </button>
+
+      <button @click="GetRenderedImage" class="btn">Get Current Image</button>
+
+      <button @click="toggleImageDisplay" class="btn toggle-btn">
+        {{ showImage ? "Hide Image" : "Show Image" }}
       </button>
 
       <button @click="toggleCameraPosition" class="btn toggle-btn">
-        {{ showCameraPosition ? 'Hide Camera' : 'Show Camera' }}
+        {{ showCameraPosition ? "Hide Camera" : "Show Camera" }}
       </button>
+    </div>
+
+    <!-- Image display with conditional rendering -->
+    <div v-if="showImage" class="image-container">
+      <h4>Current Rendered Image</h4>
+      <canvas
+        ref="currentImageCanvas"
+        width="800"
+        height="600"
+        class="render-canvas"
+      ></canvas>
     </div>
 
     <!-- Camera Positions with conditional rendering -->
     <div v-if="showCameraPosition" class="camera-position-container">
-      <div v-for="cameraPosition in cameraPositions" :key="cameraPosition" class="camera-position-card">
+      <div
+        v-for="cameraPosition in cameraPositions"
+        :key="cameraPosition"
+        class="camera-position-card"
+      >
         <div class="position-group">
           <div class="position-item">
             <span class="position-label">X:</span>
-            <span class="position-value">{{cameraPosition.x.toFixed(2)}}</span>
+            <span class="position-value">{{
+              cameraPosition.x.toFixed(2)
+            }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Y:</span>
-            <span class="position-value">{{cameraPosition.y.toFixed(2)}}</span>
+            <span class="position-value">{{
+              cameraPosition.y.toFixed(2)
+            }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Z:</span>
-            <span class="position-value">{{cameraPosition.z.toFixed(2)}}</span>
+            <span class="position-value">{{
+              cameraPosition.z.toFixed(2)
+            }}</span>
           </div>
         </div>
         <div class="axis-group">
           <div class="position-item">
             <span class="position-label">X-Axis:</span>
-            <span class="position-value">{{ cameraPosition.cameraX.toFixed(2)}}</span>
+            <span class="position-value">{{
+              cameraPosition.cameraX.toFixed(2)
+            }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Y-Axis:</span>
-            <span class="position-value">{{ cameraPosition.cameraY.toFixed(2)}}</span>
+            <span class="position-value">{{
+              cameraPosition.cameraY.toFixed(2)
+            }}</span>
           </div>
         </div>
         <button @click="moveToPosition(cameraPosition)" class="btn">
           Move to Position
         </button>
-        
       </div>
     </div>
 
@@ -54,35 +84,72 @@
       <!-- Main Parameters Section -->
       <div class="option-card">
         <h4>Main Parameters</h4>
-        <div class="slider-group" v-for="param in exponentialParams" :key="param.name">
+        <div
+          class="slider-group"
+          v-for="param in exponentialParams"
+          :key="param.name"
+        >
           <div class="slider-with-input">
             <label>{{ param.name }}</label>
             <div class="controls">
-              <input type="range" v-model.number="param.value" :min="0" :max="10" step="1"
-                @input="updateExponentialValue(param)" />
-              <input type="number" v-model.number="param.actualValue" @input="updateSliderValue(param)"
-                class="number-input" />
+              <input
+                type="range"
+                v-model.number="param.value"
+                :min="0"
+                :max="10"
+                step="1"
+                @input="updateExponentialValue(param)"
+              />
+              <input
+                type="number"
+                v-model.number="param.actualValue"
+                @input="updateSliderValue(param)"
+                class="number-input"
+              />
             </div>
           </div>
         </div>
 
         <!-- Sliders Section -->
         <h4>Lighting Parameters</h4>
-        <div class="slider-with-input" v-for="slider in sliders" :key="slider.name">
-          <label>{{slider.name}}</label>
+        <div
+          class="slider-with-input"
+          v-for="slider in sliders"
+          :key="slider.name"
+        >
+          <label>{{ slider.name }}</label>
           <div class="controls">
-            <input v-if="slider.name=='Light Intensity'" type="range" v-model="slider.value" min="0" max="32" step="0.1" />
-            <input v-else type="range" v-model="slider.value" min="0" max="256" step="1" />
+            <input
+              v-if="slider.name == 'Light Intensity'"
+              type="range"
+              v-model="slider.value"
+              min="0"
+              max="32"
+              step="0.1"
+            />
+            <input
+              v-else
+              type="range"
+              v-model="slider.value"
+              min="0"
+              max="256"
+              step="1"
+            />
             <input type="number" v-model="slider.value" class="number-input" />
           </div>
         </div>
-
 
         <h4>Field of View</h4>
         <div class="slider-with-input">
           <label>FOV</label>
           <div class="controls">
-            <input type="range" v-model.number="FOV" min="15" max="120" step="1" />
+            <input
+              type="range"
+              v-model.number="FOV"
+              min="15"
+              max="120"
+              step="1"
+            />
             <input type="number" v-model.number="FOV" class="number-input" />
           </div>
         </div>
@@ -92,18 +159,32 @@
         <div class="slider-with-input">
           <label>Gamma</label>
           <div class="controls">
-            <input type="range" v-model.number="gamma" min="0" max="1" step="0.001" />
-            <input type="number" v-model.number="gamma" step="0.1" class="number-input" />
+            <input
+              type="range"
+              v-model.number="gamma"
+              min="0"
+              max="1"
+              step="0.001"
+            />
+            <input
+              type="number"
+              v-model.number="gamma"
+              step="0.1"
+              class="number-input"
+            />
           </div>
         </div>
       </div>
-
 
       <!-- Render Settings Section -->
       <div class="option-card">
         <h4>Render Settings</h4>
         <div class="options-flex">
-          <div class="select-group" v-for="option in binaryOptions" :key="option.name">
+          <div
+            class="select-group"
+            v-for="option in binaryOptions"
+            :key="option.name"
+          >
             <label>{{ option.name }}</label>
             <select v-model="option.value">
               <option value="yes">Yes</option>
@@ -115,7 +196,7 @@
             <label>Mode</label>
             <select v-model="selectedMode">
               <option v-for="mode in modes" :key="mode" :value="mode">
-                 {{ mode }}
+                {{ mode }}
               </option>
             </select>
           </div>
@@ -132,7 +213,11 @@
           <div class="select-group">
             <label>Version</label>
             <select v-model="renderVersion">
-              <option v-for="version in renderVersions" :key="version" :value="version">
+              <option
+                v-for="version in renderVersions"
+                :key="version"
+                :value="version"
+              >
                 {{ version }}
               </option>
             </select>
@@ -156,9 +241,10 @@ export default {
 
   data() {
     return {
-      showCameraPosition: true, // Add this line
+      showImage: false,
+      showCameraPosition: false,
       exponentialParams: [
-        { name: "Depth", value: 3, actualValue: 8 },
+        { name: "Depth", value: 1, actualValue: 1 },
         { name: "Scatter", value: 0, actualValue: 0 },
       ],
       binaryOptions: [
@@ -166,14 +252,26 @@ export default {
         { name: "Raymarching", value: "no" },
         { name: "Performance Mode", value: "no" },
       ],
-      cameraPositions : [],
-      FOV: 90,
-      resolution: "Native",
+      cameraPositions: [],
+      FOV: 35,
+      resolution: "2X",
       resolutions: ["Native", "2X", "4X", "8X"],
-      selectedMode: 'Classic',
+      selectedMode: "Classic",
       modes: ["Classic", "Normals", "Depth"],
-      renderVersion: "V2",
-      renderVersions: ["V1", "V2", "V2-Log", "V2-Linear", "V2-Linear-Texture", "V2-Log-Texture", "V4-Log", "V4-Linear", "V4-Log-Optim", "V4-Linear-Optim"],
+      renderVersion: "V2M",
+      renderVersions: [
+        "V1",
+        "V2",
+        "V2M",
+        "V2-Log",
+        "V2-Linear",
+        "V2-Linear-Texture",
+        "V2-Log-Texture",
+        "V4-Log",
+        "V4-Linear",
+        "V4-Log-Optim",
+        "V4-Linear-Optim",
+      ],
       gamma: 0.25,
       sliders: [
         { name: "Light Intensity", value: 3 },
@@ -181,9 +279,71 @@ export default {
         { name: "G", value: 1 },
         { name: "B", value: 1 },
       ],
+      currentImage: false,
     };
   },
   methods: {
+    GetRenderedImage() {
+      this.SubmitRenderOptions();
+      this.UpdateImage();
+      // wait for the image to be rendered
+      setTimeout(() => {
+        axios
+          .get(`${this.apiAddress}/sendImage`, {
+            responseType: "arraybuffer", // Request as binary data
+          })
+          .then((response) => {
+            // Convert arraybuffer to blob
+            const blob = new Blob([response.data], { type: "image/png" });
+
+            // Create object URL from blob
+            const imageUrl = URL.createObjectURL(blob);
+
+            // Get canvas and context
+            const canvas = this.$refs.currentImageCanvas;
+            if (!canvas) {
+              console.error("Canvas element not found");
+              return;
+            }
+
+            const ctx = canvas.getContext("2d");
+
+            // Load image with created URL
+            const image = new Image();
+            image.onload = () => {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+              this.currentImage = true;
+
+              // Clean up object URL after use
+              URL.revokeObjectURL(imageUrl);
+            };
+
+            image.onerror = (err) => {
+              console.error("Image failed to load:", err);
+              URL.revokeObjectURL(imageUrl);
+            };
+
+            image.src = imageUrl;
+          })
+          .catch((error) => {
+            console.error("API error:", error);
+          });
+      }, 1000);
+    },
+
+    UpdateImage() {
+      axios
+        .get(`${this.apiAddress}/getCurrentImage`)
+        .then((response) => {
+          console.log(response.data);
+          this.cameraPositions.push(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
     moveToPosition(cameraPosition) {
       axios
         .post(`${this.apiAddress}/moveToPosition`, cameraPosition)
@@ -200,8 +360,8 @@ export default {
       //   param.actualValue = 0;
       // }
       // else {
-        // param.value = param.value - 1;
-        param.actualValue = Math.pow(2, param.value) - 1;
+      // param.value = param.value - 1;
+      param.actualValue = Math.pow(2, param.value) - 1;
       // }
     },
     updateSliderValue(param) {
@@ -245,6 +405,9 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+    },
+    toggleImageDisplay() {
+      this.showImage = !this.showImage;
     },
     toggleCameraPosition() {
       this.showCameraPosition = !this.showCameraPosition;
@@ -427,7 +590,8 @@ label {
   gap: var(--spacing-unit);
 }
 
-.position-group, .axis-group {
+.position-group,
+.axis-group {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: calc(var(--spacing-unit) * 0.5);
@@ -450,7 +614,7 @@ label {
 
 .position-value {
   color: var(--accent-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.9rem;
 }
 
@@ -459,10 +623,40 @@ label {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.image-container {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.render-canvas {
+  display: block;
+  margin: 10px auto;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn {
+  background-color: var(--accent-color);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background-color: var(--accent-color-dark);
+  transform: translateY(-2px);
 }
 
 /* ...existing styles... */
