@@ -178,6 +178,25 @@
                     <span>{{ selectedShader.Lighten.toFixed(2) }}</span>
                 </div>
             </template>
+
+            <template v-if="selectedShader.type === 'CRT'">
+                <div class="control-group">
+                    <label>Base:</label>
+                    <input type="range" v-model.number="selectedShader.Base" min="0" max="1" step="0.01" />
+                    <span>{{ selectedShader.Base.toFixed(2) }}</span>
+                </div>
+                <div class="control-group">
+                    <label>Glow:</label>
+                    <input type="range" v-model.number="selectedShader.Glow" min="0" max="8" step="0.01" />
+                    <span>{{ selectedShader.Glow.toFixed(2) }}</span>
+                </div>
+                <div class="control-group">
+                    <label>Radius:</label>
+                    <input type="range" v-model.number="selectedShader.Radius" min="0" max="100" step="1" />
+                    <span>{{ selectedShader.Radius.toFixed(2) }}</span>
+                </div>
+            </template>
+
         </div>
     </div>
 </template>
@@ -253,6 +272,13 @@ export default {
                     Lighten: 0.1,
                     amount: 0.1,
                     multipass: 1,
+                },
+                CRT: {
+                    amount: 0.1,
+                    multipass: 1,
+                    Base : 0.5,
+                    Glow : 1.5,
+                    Radius : 16.0,
                 },
             },
             selectedType: "contrast",
