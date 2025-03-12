@@ -248,10 +248,10 @@ export default {
         { name: "Scatter", value: 0, actualValue: 0 },
       ],
       binaryOptions: [
+        { name : 'Paint Texture', value: "no"},
         { name: "Snap Light to Camera", value: "no" },
         { name: "Raymarching", value: "no" },
         { name: "Performance Mode", value: "no" },
-        { name : 'Paint Texture', value: "no"},
       ],
       cameraPositions: [],
       FOV: 35,
