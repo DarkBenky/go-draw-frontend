@@ -251,6 +251,7 @@ export default {
         { name: "Snap Light to Camera", value: "no" },
         { name: "Raymarching", value: "no" },
         { name: "Performance Mode", value: "no" },
+        { name : 'Paint Texture', value: "no"},
       ],
       cameraPositions: [],
       FOV: 35,
@@ -398,6 +399,7 @@ export default {
         r: Number(this.sliders[1].value),
         g: Number(this.sliders[2].value),
         b: Number(this.sliders[3].value),
+        paintTexture: this.binaryOptions[3].value,
       };
       axios
         .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)
