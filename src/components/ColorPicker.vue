@@ -28,15 +28,33 @@
         :G="this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier"
         :B="this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier"
         :A="this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier"
-       />
+        :NormalChanelMultiplayer="this.NormalChanelMultiplayer"
+        :EnableNegativeNormal="this.enableNegativeNormalValue" />
     </div>
 
     <!-- Additional Settings -->
     <h3>Additional Settings</h3>
     <div class="sliders-v2">
+      <div class="select-group">
+        <label>Enable Negative Normals</label>
+        <select v-model="enableNegativeNormalValue">
+          <option v-for="res in enableNegativeNormal" :key="res" :value="res">
+            {{ res }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Normal chanel multiplayer -->
+      <div class="slider-v2">
+        <label for="Normal Chanel Multiplayer">Normal Chanel Multiplayer:</label>
+        <input type="range" id="Normal Chanel Multiplayer" v-model.number="normalChanelMultiplayer" min="0" max="1"
+          step="0.01" />
+        <span>{{ normalChanelMultiplayer }}</span>
+      </div>
       <div v-for="slider in sliders" :key="slider.name" class="slider-v2">
         <label :for="slider.name">{{ slider.name }}:</label>
-        <input v-if="slider.t == 'multiplier'" type="range" :id="slider.name" v-model.number="slider.value" min="0" max="128" step="0.01" />
+        <input v-if="slider.t == 'multiplier'" type="range" :id="slider.name" v-model.number="slider.value" min="0"
+          max="128" step="0.01" />
         <input v-else type="range" :id="slider.name" v-model.number="slider.value" min="0" max="1" step="0.01" />
         <span>{{ slider.value.toFixed(2) }}</span>
       </div>
@@ -62,17 +80,20 @@ export default {
         { name: "B", value: 0, multiplier: 1 },
         { name: "A", value: 0, multiplier: 1 },
       ],
+      normalChanelMultiplayer: 1,
       sliders: [
-        { name: "Reflection", value: 0.5 , t: "normal"},
-        { name: "Direct to Scatter", value: 0.5 , t: "normal"},
-        { name: "Roughness", value: 0.5 , t: "normal"},
-        { name: "Metallic", value: 0.5 , t: "normal"},
+        { name: "Reflection", value: 0.5, t: "normal" },
+        { name: "Direct to Scatter", value: 0.5, t: "normal" },
+        { name: "Roughness", value: 0.5, t: "normal" },
+        { name: "Metallic", value: 0.5, t: "normal" },
         { name: "Specular", value: 0.5, t: "normal" },
-        { name: "Red Channel Multiplayer", value: 1 , t: "multiplier"},
+        { name: "Red Channel Multiplayer", value: 1, t: "multiplier" },
         { name: "Green Channel Multiplayer", value: 1, t: "multiplier" },
         { name: "Blue Channel Multiplayer", value: 1, t: "multiplier" },
         { name: "Alpha Channel Multiplayer", value: 1, t: "multiplier" },
       ],
+      enableNegativeNormal: ['Yes', 'No'],
+      enableNegativeNormalValue: 'No',
     };
   },
   computed: {
@@ -80,7 +101,8 @@ export default {
       const r = this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier;
       const g = this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier;
       const b = this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier;
-      const a = this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier / 255;
+      const a =
+        (this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier) / 255;
 
       return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(
         b
@@ -103,14 +125,22 @@ export default {
   methods: {
     submitColor() {
       const colorData = {
-        r: parseFloat((this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier / 255)),
-        g: parseFloat((this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier / 255)),
-        b: parseFloat((this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier / 255)),
-        a: parseFloat((this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier / 255)),
+        r: parseFloat(
+          (this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier) / 255
+        ),
+        g: parseFloat(
+          (this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier) / 255
+        ),
+        b: parseFloat(
+          (this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier) / 255
+        ),
+        a: parseFloat(
+          (this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier) / 255
+        ),
         reflection: parseFloat(this.sliders[0].value.toFixed(2)),
         directToScatter: parseFloat(this.sliders[1].value.toFixed(2)),
         roughness: parseFloat(this.sliders[2].value.toFixed(2)),
-        metalic: parseFloat(this.sliders[3].value.toFixed(2))
+        metalic: parseFloat(this.sliders[3].value.toFixed(2)),
       };
 
       axios
@@ -121,12 +151,33 @@ export default {
         .catch((error) => {
           console.error(error);
         });
-    }
-  }
+    },
+  },
 };
 </script>
 
+
 <style scoped>
+.select-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: calc(var(--spacing-unit) * 0.5);
+}
+
+select {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+select:hover {
+  border-color: var(--accent-primary);
+}
+
 .color-preview-container {
   display: inline;
   align-items: center;
@@ -185,8 +236,7 @@ button:hover {
   border-radius: var(--border-radius);
   margin: var(--spacing-unit) 0;
   border: 2px solid rgba(255, 255, 255, 0.05);
-  background-image:
-    linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+  background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
     linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
     linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
@@ -250,7 +300,7 @@ label {
 
 span {
   color: var(--text-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.9rem;
 }
 

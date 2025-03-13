@@ -94,6 +94,14 @@ export default {
             type: Number,
             required: true
         },
+        NormalChanelMultiplayer: {
+            type: Number,
+            required: true
+        },
+        EnableNegativeNormal: {
+            type: String,
+            required: true
+        }
     },
     data() {
         return {
@@ -146,9 +154,29 @@ export default {
             },
             deep: true
         },
+        NormalChanelMultiplayer: {
+            handler() {
+                console.log('Normal Chanel Multiplayer updated:', this.NormalChanelMultiplayer);
+            },
+            deep: true
+        },
+        EnableNegativeNormal: {
+            handler() {
+                console.log('Enable Negative Normal updated:', this.EnableNegativeNormal);
+            },
+            deep: true
+        }
     },
     methods: {
-
+        applyMultiplayerForNormal() {
+            let Normal = this.normals[this.currentTextureIndex];
+            for (let i = 0; i < Normal.length; i++) {
+                for (let j = 0; j < Normal.data.length; j++) {
+                    Normal.data[j] = Normal.data[j] * this.NormalChanelMultiplayer;
+                }
+            }
+            
+        },
         async submitTextures() {
             console.log('Selected Textures:', this.texturesRGBA_Float32[this.currentTextureIndex].data);
             console.log('Selected Color:', this.MaterialProperties);
@@ -331,10 +359,17 @@ export default {
 
                 // Convert to normal map format and store
                 for (let i = 0; i < imageData.data.length; i += 4) {
+                    if (this.EnableNegativeNormal) {
                     this.normals[this.currentTextureIndex].data[i] = imageData.data[i] / 127 - 1;     // R
                     this.normals[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1] / 127 - 1; // G
                     this.normals[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2] / 127 - 1; // B
                     this.normals[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3] / 127 - 1; // A
+                    } else {
+                        this.normals[this.currentTextureIndex].data[i] = imageData.data[i] / 255;     // R
+                        this.normals[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1] / 255; // G
+                        this.normals[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2] / 255; // B
+                        this.normals[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3] / 255; // A
+                    }
                 }
 
                 // save image into noramlsImage
