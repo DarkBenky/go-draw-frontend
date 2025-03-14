@@ -65,6 +65,7 @@
 
 <script>
 import axios from 'axios';
+import { apply } from 'core-js/fn/reflect';
 
 
 export default {
@@ -175,7 +176,7 @@ export default {
                     Normal.data[j] = Normal.data[j] * this.NormalChanelMultiplayer;
                 }
             }
-            
+            return Normal;
         },
         async submitTextures() {
             console.log('Selected Textures:', this.texturesRGBA_Float32[this.currentTextureIndex].data);
@@ -184,7 +185,7 @@ export default {
             // console.log('Texture:', texture);
             const data = {
                 textures: this.texturesRGBA_Float32[this.currentTextureIndex],
-                normals: this.normals[this.currentTextureIndex],
+                normals: this.applyMultiplayerForNormal(),
                 reflection: Number(this.MaterialProperties.reflection),
                 directToScatter: Number(this.MaterialProperties.directToScatter),
                 roughness: Number(this.MaterialProperties.roughness),
