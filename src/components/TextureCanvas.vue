@@ -39,34 +39,42 @@
 
             <div class="material-properties">
                 <div class="property-card">
-                  <div class="property-label">Reflection</div>
-                  <div class="property-value">{{ textureProperties[currentTextureIndex].reflection }}</div>
+                    <div class="property-label">Reflection</div>
+                    <div class="property-value">
+                        {{ textureProperties[currentTextureIndex].reflection }}
+                    </div>
                 </div>
                 <div class="property-card">
-                  <div class="property-label">Direct to Scatter</div>
-                  <div class="property-value">{{ textureProperties[currentTextureIndex].directToScatter }}</div>
+                    <div class="property-label">Direct to Scatter</div>
+                    <div class="property-value">
+                        {{ textureProperties[currentTextureIndex].directToScatter }}
+                    </div>
                 </div>
                 <div class="property-card">
-                  <div class="property-label">Roughness</div>
-                  <div class="property-value">{{ textureProperties[currentTextureIndex].roughness }}</div>
+                    <div class="property-label">Roughness</div>
+                    <div class="property-value">
+                        {{ textureProperties[currentTextureIndex].roughness }}
+                    </div>
                 </div>
                 <div class="property-card">
-                  <div class="property-label">Metallic</div>
-                  <div class="property-value">{{ textureProperties[currentTextureIndex].metallic }}</div>
+                    <div class="property-label">Metallic</div>
+                    <div class="property-value">
+                        {{ textureProperties[currentTextureIndex].metallic }}
+                    </div>
                 </div>
                 <div class="property-card">
                     <div class="property-label">Specular</div>
-                    <div class="property-value">{{ textureProperties[currentTextureIndex].specular }}</div>
-                  </div>
-              </div>  
+                    <div class="property-value">
+                        {{ textureProperties[currentTextureIndex].specular }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
-import { apply } from 'core-js/fn/reflect';
-
 
 export default {
     name: 'TextureCanvas',
@@ -95,14 +103,6 @@ export default {
             type: Number,
             required: true
         },
-        NormalChanelMultiplayer: {
-            type: Number,
-            required: true
-        },
-        EnableNegativeNormal: {
-            type: String,
-            required: true
-        }
     },
     data() {
         return {
@@ -155,25 +155,15 @@ export default {
             },
             deep: true
         },
-        NormalChanelMultiplayer: {
-            handler() {
-                console.log('Normal Chanel Multiplayer updated:', this.NormalChanelMultiplayer);
-            },
-            deep: true
-        },
-        EnableNegativeNormal: {
-            handler() {
-                console.log('Enable Negative Normal updated:', this.EnableNegativeNormal);
-            },
-            deep: true
-        }
     },
     methods: {
         applyMultiplayerForNormal() {
             let Normal = this.normals[this.currentTextureIndex];
-            for (let i = 0; i < Normal.length; i++) {
-                for (let j = 0; j < Normal.data.length; j++) {
-                    Normal.data[j] = Normal.data[j] * this.NormalChanelMultiplayer;
+            for (let i = 0; i < Normal.data.length; i++) {
+                if (this.MaterialProperties.enableNegativeNormal === "No") {
+                    Normal.data[i] = Normal.data[i] * this.MaterialProperties.normalChanelMultiplayer;
+                } else {
+                    Normal.data[i] = (Normal.data[i] - 0.5) * this.MaterialProperties.normalChanelMultiplayer + 0.5;
                 }
             }
             return Normal;
@@ -183,20 +173,26 @@ export default {
             console.log('Selected Color:', this.MaterialProperties);
             // let texture = this.updateTextureMultiplayer();
             // console.log('Texture:', texture);
+            const normal = this.applyMultiplayerForNormal();
+            console.log('Normal:', normal.data[1]);
+            console.log('Normal:', normal.data[2]);
+            console.log('Normal:', normal.data[3]);
+            console.log('NormalChanelMultiplayer:', this.MaterialProperties.normalChanelMultiplayer);
+            console.log('EnableNegativeNormal:', this.MaterialProperties.enableNegativeNormal);
             const data = {
                 textures: this.texturesRGBA_Float32[this.currentTextureIndex],
-                normals: this.applyMultiplayerForNormal(),
+                normals: normal,
                 reflection: Number(this.MaterialProperties.reflection),
                 directToScatter: Number(this.MaterialProperties.directToScatter),
                 roughness: Number(this.MaterialProperties.roughness),
                 metallic: Number(this.MaterialProperties.metallic),
                 index: Number(this.currentTextureIndex),
                 // normal : this.normalsImage[this.currentTextureIndex],
-                specular : Number(this.MaterialProperties.specular),
-                ColorR : Number(this.MaterialProperties.R),
-                ColorG : Number(this.MaterialProperties.G),
-                ColorB : Number(this.MaterialProperties.B),
-                ColorA : Number(this.MaterialProperties.A)
+                specular: Number(this.MaterialProperties.specular),
+                ColorR: Number(this.MaterialProperties.R),
+                ColorG: Number(this.MaterialProperties.G),
+                ColorB: Number(this.MaterialProperties.B),
+                ColorA: Number(this.MaterialProperties.A)
             };
 
             console.log('Submitting Textures...', data);
@@ -264,11 +260,13 @@ export default {
             if (!this.isDrawing) return;
 
             const rect = e.target.getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / this.pixelSize);
-            const y = Math.floor((e.clientY - rect.top) / this.pixelSize);
+            // const x = Math.floor((e.clientX - rect.left) / this.pixelSize);
+            // const y = Math.floor((e.clientY - rect.top) / this.pixelSize);
 
-            const x1 = Math.floor((e.clientX - rect.left) );
-            const y1 = Math.floor((e.clientY - rect.top) );
+            const x1 = Math.floor((e.clientX - rect.left));
+            const y1 = Math.floor((e.clientY - rect.top));
+
+            console.log(this.R, this.G, this.B, this.A);
 
             // set color in TextureFloat32Array
             for (let by = 0; by < this.brushSize; by++) {
@@ -277,7 +275,6 @@ export default {
                     const py = y1 + by;
                     if (px >= 0 && px < 128 && py >= 0 && py < 128) {
                         const index = (py * 128 + px) * 4;
-                        console.log('x:', x, 'y:', y, 'index:', index);
                         this.texturesRGBA_Float32[this.currentTextureIndex].data[index] = this.R;
                         this.texturesRGBA_Float32[this.currentTextureIndex].data[index + 2] = this.B;
                         this.texturesRGBA_Float32[this.currentTextureIndex].data[index + 1] = this.G;
@@ -360,17 +357,10 @@ export default {
 
                 // Convert to normal map format and store
                 for (let i = 0; i < imageData.data.length; i += 4) {
-                    if (this.EnableNegativeNormal) {
-                    this.normals[this.currentTextureIndex].data[i] = imageData.data[i] / 127 - 1;     // R
-                    this.normals[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1] / 127 - 1; // G
-                    this.normals[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2] / 127 - 1; // B
-                    this.normals[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3] / 127 - 1; // A
-                    } else {
-                        this.normals[this.currentTextureIndex].data[i] = imageData.data[i] / 255;     // R
-                        this.normals[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1] / 255; // G
-                        this.normals[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2] / 255; // B
-                        this.normals[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3] / 255; // A
-                    }
+                    this.normals[this.currentTextureIndex].data[i] = imageData.data[i] / 255;     // R
+                    this.normals[this.currentTextureIndex].data[i + 1] = imageData.data[i + 1] / 255; // G
+                    this.normals[this.currentTextureIndex].data[i + 2] = imageData.data[i + 2] / 255; // B
+                    this.normals[this.currentTextureIndex].data[i + 3] = imageData.data[i + 3] / 255; // A
                 }
 
                 // save image into noramlsImage
@@ -394,9 +384,9 @@ export default {
     background: var(--bg-tertiary);
     border-radius: var(--border-radius);
     min-width: 200px;
-  }
-  
-  .property-card {
+}
+
+.property-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -405,28 +395,28 @@ export default {
     border-radius: calc(var(--border-radius) * 0.5);
     transition: transform 0.2s ease;
     border: 1px solid var(--border-color);
-  }
-  
-  .property-card:hover {
+}
+
+.property-card:hover {
     transform: translateX(4px);
     background: var(--bg-tertiary);
-  }
-  
-  .property-label {
+}
+
+.property-label {
     color: var(--text-secondary);
     font-size: 0.9rem;
-  }
-  
-  .property-value {
+}
+
+.property-value {
     background: linear-gradient(135deg, var(--accent-primary), #3a8eef);
     padding: 4px 8px;
     border-radius: calc(var(--border-radius) * 0.5);
     color: white;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: "JetBrains Mono", monospace;
     font-size: 0.9rem;
     min-width: 50px;
     text-align: center;
-  }
+}
 
 .texture-editor {
     display: flex;

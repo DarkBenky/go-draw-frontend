@@ -27,9 +27,7 @@
         :R="this.rgbaChannels[0].value * this.rgbaChannels[0].multiplier"
         :G="this.rgbaChannels[1].value * this.rgbaChannels[1].multiplier"
         :B="this.rgbaChannels[2].value * this.rgbaChannels[2].multiplier"
-        :A="this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier"
-        :NormalChanelMultiplayer="this.NormalChanelMultiplayer"
-        :EnableNegativeNormal="this.enableNegativeNormalValue" />
+        :A="this.rgbaChannels[3].value * this.rgbaChannels[3].multiplier" />
     </div>
 
     <!-- Additional Settings -->
@@ -47,7 +45,7 @@
       <!-- Normal chanel multiplayer -->
       <div class="slider-v2">
         <label for="Normal Chanel Multiplayer">Normal Chanel Multiplayer:</label>
-        <input type="range" id="Normal Chanel Multiplayer" v-model.number="normalChanelMultiplayer" min="0" max="1"
+        <input type="range" id="Normal Chanel Multiplayer" v-model.number="this.normalChanelMultiplayer" min="0" max="10"
           step="0.01" />
         <span>{{ normalChanelMultiplayer }}</span>
       </div>
@@ -119,6 +117,8 @@ export default {
         G: this.sliders[6].value.toFixed(2),
         B: this.sliders[7].value.toFixed(2),
         A: this.sliders[8].value.toFixed(2),
+        normalChanelMultiplayer: this.normalChanelMultiplayer,
+        enableNegativeNormal: this.enableNegativeNormalValue,
       };
     },
   },

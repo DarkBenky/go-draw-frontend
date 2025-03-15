@@ -332,7 +332,7 @@ export default {
           .catch((error) => {
             console.error("API error:", error);
           });
-      }, 1000);
+      }, 500);
     },
 
     UpdateImage() {
@@ -383,14 +383,14 @@ export default {
     },
 
     SubmitRenderOptions() {
-      console.log("Submitting render options...");
+      console.log("Submitting render options...", this.binaryOptions);
       const renderOptions = {
         depth: this.exponentialParams[0].actualValue,
         scatter: this.exponentialParams[1].actualValue,
         gamma: this.gamma,
-        snapLight: this.binaryOptions[0].value,
-        rayMarching: this.binaryOptions[1].value,
-        performance: this.binaryOptions[2].value,
+        snapLight: this.binaryOptions[1].value,
+        rayMarching: this.binaryOptions[2].value,
+        performance: this.binaryOptions[3].value,
         resolution: this.resolution,
         version: this.renderVersion,
         mode: this.selectedMode,
@@ -399,7 +399,7 @@ export default {
         r: Number(this.sliders[1].value),
         g: Number(this.sliders[2].value),
         b: Number(this.sliders[3].value),
-        paintTexture: this.binaryOptions[3].value,
+        paintTexture: this.binaryOptions[0].value,
       };
       axios
         .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)
