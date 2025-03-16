@@ -273,7 +273,8 @@ export default {
         "V4-Log-Optim",
         "V4-Linear-Optim",
         "V4-Log-Optim-V2",
-        "V4-Linear-Optim-V2"
+        "V4-Linear-Optim-V2",
+        "V4-Optim-V2"
       ],
       gamma: 0.25,
       sliders: [
