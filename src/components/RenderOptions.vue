@@ -194,11 +194,12 @@
 
           <div class="select-group">
             <label>Mode</label>
-            <select v-model="selectedMode">
+            <select v-if="['V2-Log', 'V2-Linear', 'V2-Linear-Texture', 'V2-Log-Texture', 'V4-Log', 'V4-Linear'].includes(renderVersion)" v-model="selectedMode">
               <option v-for="mode in modes" :key="mode" :value="mode">
                 {{ mode }}
               </option>
             </select>
+            <label v-else>Normal and Depth mode are not available for this version</label>
           </div>
 
           <div class="select-group">
@@ -258,7 +259,7 @@ export default {
       resolution: "2X",
       resolutions: ["Native", "2X", "4X", "8X"],
       selectedMode: "Classic",
-      modes: ["Classic", "Normals", "Depth"],
+      modes: ["Classic", "Normals"],
       renderVersion: "V2M",
       renderVersions: [
         "V1",
