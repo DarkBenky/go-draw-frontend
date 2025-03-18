@@ -4,12 +4,14 @@
 
     <div class="button-group">
       <button @click="SubmitRenderOptions" class="btn">
-        Submit Render Options
+        Submit
       </button>
 
       <button @click="GetCameraPosition" class="btn">
         Get Camera Position
       </button>
+
+      <button @click="GetSpheres" class="btn">Get Spheres</button>
 
       <button @click="GetRenderedImage" class="btn">Get Current Image</button>
 
@@ -223,8 +225,120 @@
               </option>
             </select>
           </div>
+          <div class="select-group">
+            <label>Version</label>
+            <select v-model="RaymarchingVersion">
+              <option
+                v-for="version in RaymarchingVersions"
+                :key="version"
+                :value="version"
+              >
+                {{ version }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
+
+      <div v-if="spheres.length > 0" class="option-card sphere-editor">
+        <h4>Spheres Editor</h4>
+        <div class="sphere-list">
+          <div v-for="(sphere, index) in spheres[0]" :key="index" class="sphere-item">
+            <div class="sphere-header">
+              <h5 class="sphere-title">Sphere {{index}}</h5>
+              <div class="sphere-color-preview" 
+                :style="{backgroundColor: `rgb(${sphere.colorR || 0}, ${sphere.colorG || 0}, ${sphere.colorB || 0})`}">
+              </div>
+            </div>
+            
+            <!-- Position Controls with +/- buttons -->
+            <div class="sphere-control-group">
+              <div class="control-label">Position</div>
+              <div class="position-controls">
+                <div class="axis-control" v-for="axis in ['X', 'Y', 'Z']" :key="axis">
+                  <label>{{axis}}</label>
+                  <div class="position-input-group">
+                    <button @click="adjustPosition(sphere, `center${axis}`, -0.5)" class="position-btn">−</button>
+                    <input 
+                      type="number" 
+                      v-model.number="sphere[`center${axis}`]" 
+                      step="0.1" 
+                      class="position-input" 
+                    />
+                    <button @click="adjustPosition(sphere, `center${axis}`, 0.5)" class="position-btn">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Radius Control -->
+            <div class="sphere-control-group">
+              <div class="control-label">Radius</div>
+              <div class="radius-input-group">
+                <button @click="adjustPosition(sphere, 'radius', -0.1)" class="position-btn">−</button>
+                <input 
+                  type="number" 
+                  v-model.number="sphere.radius" 
+                  min="0.1" 
+                  step="0.1" 
+                  class="radius-input" 
+                />
+                <button @click="adjustPosition(sphere, 'radius', 0.1)" class="position-btn">+</button>
+              </div>
+            </div>
+            
+            <!-- Color Controls -->
+            <div class="sphere-control-group">
+              <div class="control-label">Color</div>
+              <div class="color-controls">
+                <div class="color-slider" v-for="colorName in ['R', 'G', 'B', 'A']" :key="colorName">
+                  <span class="color-label">{{colorName}}</span>
+                  <div class="color-input-group">
+                    <input 
+                      type="range" 
+                      v-model.number="sphere[`color${colorName}`]" 
+                      min="0" 
+                      max="255" 
+                      step="1" 
+                      class="color-range" 
+                    />
+                    <input 
+                      type="number" 
+                      v-model.number="sphere[`color${colorName}`]" 
+                      min="0" 
+                      max="255" 
+                      class="color-value" 
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- SDF Type Controls -->
+            <div class="sphere-control-group" v-if="'SdfType' in sphere">
+              <div class="control-label">SDF Type</div>
+              <select v-model.number="sphere.SdfType" class="sdf-select">
+                <option v-for="(value, name) in types" :key="name" :value="value">
+                  {{name}}
+                </option>
+              </select>
+            </div>
+            
+            <!-- Other Sphere Index -->
+            <div class="sphere-control-group" v-if="'IndexOfOtherSphere' in sphere">
+              <div class="control-label">Related Sphere</div>
+              <select v-model.number="sphere.IndexOfOtherSphere" class="sdf-select">
+                <option v-for="i in spheres[0].length" :key="i-1" :value="i-1">
+                  Sphere {{i-1}}
+                </option>
+              </select>
+            </div>
+            
+            <button @click="updateSphere(index)" class="update-sphere-btn">Update Sphere</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -277,6 +391,8 @@ export default {
         "V4-Linear-Optim-V2",
         "V4-Optim-V2"
       ],
+      RaymarchingVersions: ["V1","V2"],
+      RaymarchingVersion : "V2",
       gamma: 0.25,
       sliders: [
         { name: "Light Intensity", value: 3 },
@@ -285,9 +401,31 @@ export default {
         { name: "B", value: 1 },
       ],
       currentImage: false,
+      spheres : [],
+      types : {}
     };
   },
   methods: {
+    GetSpheres() {
+      axios
+        .get(`${this.apiAddress}/getSpheres`)
+        .then((response) => {
+          console.log(response.data);
+          this.spheres.push(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+      axios
+        .get(`${this.apiAddress}/getTypes`)
+        .then((response) => {
+          console.log(response.data);
+          this.types = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     GetRenderedImage() {
       this.SubmitRenderOptions();
       this.UpdateImage();
@@ -402,6 +540,7 @@ export default {
         g: Number(this.sliders[2].value),
         b: Number(this.sliders[3].value),
         paintTexture: this.binaryOptions[0].value,
+        rayMarchingVersion: this.RaymarchingVersion,
       };
       axios
         .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)
@@ -417,6 +556,9 @@ export default {
     },
     toggleCameraPosition() {
       this.showCameraPosition = !this.showCameraPosition;
+    },
+    adjustPosition(sphere, property, amount) {
+      sphere[property] += amount;
     },
   },
 };
@@ -665,5 +807,195 @@ label {
   transform: translateY(-2px);
 }
 
-/* ...existing styles... */
+/* Add these styles to your existing <style> block */
+.sphere-editor {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.sphere-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-unit);
+}
+
+.sphere-item {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-unit);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.sphere-item:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sphere-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-unit);
+}
+
+.sphere-title {
+  font-size: 1rem;
+  color: var(--accent-primary);
+  margin: 0;
+}
+
+.sphere-color-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.sphere-control-group {
+  margin-bottom: var(--spacing-unit);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: var(--spacing-unit);
+}
+
+.sphere-control-group:last-of-type {
+  border-bottom: none;
+}
+
+.control-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+.position-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.axis-control {
+  flex: 1;
+  min-width: 120px;
+}
+
+.color-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.color-slider {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.sdf-select {
+  width: 100%;
+  padding: 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+.sdf-select:focus {
+  border-color: var(--accent-primary);
+  outline: none;
+}
+
+.update-sphere-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent-primary), #3a8eef);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.update-sphere-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 158, 255, 0.2);
+}
+
+.position-input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.position-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.position-btn:hover {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.position-input {
+  width: 60px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-primary);
+  text-align: right;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.radius-input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.radius-input {
+  width: 60px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-primary);
+  text-align: right;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.color-input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.color-range {
+  flex: 1;
+}
+
+.color-value {
+  width: 60px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-primary);
+  text-align: right;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.color-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
 </style>
