@@ -258,14 +258,14 @@
                 <div class="axis-control" v-for="axis in ['X', 'Y', 'Z']" :key="axis">
                   <label>{{axis}}</label>
                   <div class="position-input-group">
-                    <button @click="adjustPosition(sphere, `center${axis}`, -0.5)" class="position-btn">−</button>
+                    <button @click="adjustPosition(sphere, `center${axis}`, -0.5, index)" class="position-btn">−</button>
                     <input 
                       type="number" 
                       v-model.number="sphere[`center${axis}`]" 
                       step="0.1" 
                       class="position-input" 
                     />
-                    <button @click="adjustPosition(sphere, `center${axis}`, 0.5)" class="position-btn">+</button>
+                    <button @click="adjustPosition(sphere, `center${axis}`, 0.5, index)" class="position-btn">+</button>
                   </div>
                 </div>
               </div>
@@ -275,7 +275,7 @@
             <div class="sphere-control-group">
               <div class="control-label">Radius</div>
               <div class="radius-input-group">
-                <button @click="adjustPosition(sphere, 'radius', -0.1)" class="position-btn">−</button>
+                <button @click="adjustPosition(sphere, 'radius', -1, index)" class="position-btn">−</button>
                 <input 
                   type="number" 
                   v-model.number="sphere.radius" 
@@ -283,7 +283,22 @@
                   step="0.1" 
                   class="radius-input" 
                 />
-                <button @click="adjustPosition(sphere, 'radius', 0.1)" class="position-btn">+</button>
+                <button @click="adjustPosition(sphere, 'radius', 1, index)" class="position-btn">+</button>
+              </div>
+            </div>
+
+            <!-- Amount Control -->
+            <div class="sphere-control-group">
+              <div class="control-label">Amount</div>
+              <div class="position-input-group">
+                <button @click="adjustPosition(sphere, 'amount', -1, index)" class="position-btn">−</button>
+                <input 
+                  type="number" 
+                  v-model.number="sphere.amount" 
+                  step="0.1" 
+                  class="position-input" 
+                />
+                <button @click="adjustPosition(sphere, 'amount', 1, index)" class="position-btn">+</button>
               </div>
             </div>
             
@@ -315,9 +330,9 @@
             </div>
             
             <!-- SDF Type Controls -->
-            <div class="sphere-control-group" v-if="'SdfType' in sphere">
+            <div class="sphere-control-group" v-if="'sdfType' in sphere">
               <div class="control-label">SDF Type</div>
-              <select v-model.number="sphere.SdfType" class="sdf-select">
+              <select v-model.number="sphere.sdfType" class="sdf-select">
                 <option v-for="(value, name) in types" :key="name" :value="value">
                   {{name}}
                 </option>
@@ -325,9 +340,9 @@
             </div>
             
             <!-- Other Sphere Index -->
-            <div class="sphere-control-group" v-if="'IndexOfOtherSphere' in sphere">
+            <div class="sphere-control-group" v-if="'indexOfOtherSphere' in sphere">
               <div class="control-label">Related Sphere</div>
-              <select v-model.number="sphere.IndexOfOtherSphere" class="sdf-select">
+              <select v-model.number="sphere.indexOfOtherSphere" class="sdf-select">
                 <option v-for="i in spheres[0].length" :key="i-1" :value="i-1">
                   Sphere {{i-1}}
                 </option>
@@ -406,11 +421,25 @@ export default {
     };
   },
   methods: {
+    updateSphere(index) {
+      let sphere = this.spheres[0][index];
+      sphere.index = index;
+      axios
+        .post(`${this.apiAddress}/updateSphere`, sphere)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
     GetSpheres() {
       axios
         .get(`${this.apiAddress}/getSpheres`)
         .then((response) => {
           console.log(response.data);
+          this.spheres = [];
           this.spheres.push(response.data);
         })
         .catch((error) => {
@@ -557,8 +586,9 @@ export default {
     toggleCameraPosition() {
       this.showCameraPosition = !this.showCameraPosition;
     },
-    adjustPosition(sphere, property, amount) {
+    adjustPosition(sphere, property, amount, index) {
       sphere[property] += amount;
+      this.updateSphere(index);
     },
   },
 };
