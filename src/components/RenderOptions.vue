@@ -479,6 +479,10 @@ export default {
             }
 
             const ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = false;
+            ctx.mozImageSmoothingEnabled = false;
+            ctx.webkitImageSmoothingEnabled = false;
+            ctx.msImageSmoothingEnabled = false;
 
             // Load image with created URL
             const image = new Image();
@@ -501,7 +505,7 @@ export default {
           .catch((error) => {
             console.error("API error:", error);
           });
-      }, 500);
+      }, 2500);
     },
 
     UpdateImage() {
