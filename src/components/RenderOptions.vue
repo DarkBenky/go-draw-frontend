@@ -340,7 +340,7 @@
             </div>
             
             <!-- Other Sphere Index -->
-            <div class="sphere-control-group" v-if="'indexOfOtherSphere' in sphere">
+            <div class="sphere-control-group" v-if="'indexOfOtherSphere'  && sphere.sdfType != 'distance' in sphere">
               <div class="control-label">Related Sphere</div>
               <select v-model.number="sphere.indexOfOtherSphere" class="sdf-select">
                 <option v-for="i in spheres[0].length" :key="i-1" :value="i-1">
