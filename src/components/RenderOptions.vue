@@ -1,65 +1,83 @@
 <template>
   <div class="render-options">
-    <h3>Render Options</h3>
+    <div class="header-section">
+      <h3>Render Options</h3>
 
-    <div class="button-group">
-      <button @click="SubmitRenderOptions" class="btn">
-        Submit
-      </button>
+      <div class="controls-container">
+        <!-- Main Actions -->
+        <div class="button-panel">
+          <button @click="SubmitRenderOptions" class="action-btn primary-btn">
+            <span class="btn-icon"></span>
+            <span>Submit</span>
+          </button>
 
-      <button @click="GetCameraPosition" class="btn">
-        Get Camera Position
-      </button>
+          <button @click="GetRenderedImage" class="action-btn primary-btn">
+            <span class="btn-icon"></span>
+            <span>Get Image</span>
+          </button>
 
-      <button @click="GetSpheres" class="btn">Get Spheres</button>
+          <button @click="toggleImageDisplay" class="action-btn toggle-btn">
+            <span class="btn-icon"></span>
+            <span>{{ showImage ? "Hide Image" : "Show Image" }}</span>
+          </button>
+        </div>
 
-      <button @click="GetRenderedImage" class="btn">Get Current Image</button>
+        <!-- Camera & Scene Controls -->
+        <div class="button-panel">
+          <button @click="GetCameraPosition" class="action-btn secondary-btn">
+            <span class="btn-icon"></span>
+            <span>Get Camera Position</span>
+          </button>
 
-      <button @click="toggleImageDisplay" class="btn toggle-btn">
-        {{ showImage ? "Hide Image" : "Show Image" }}
-      </button>
+          <button @click="toggleCameraPosition" class="action-btn toggle-btn">
+            <span class="btn-icon"></span>
+            <span>{{ showCameraPosition ? "Hide Cameras Positions" : "Show Camera Positions" }}</span>
+          </button>
 
-      <button @click="toggleCameraPosition" class="btn toggle-btn">
-        {{ showCameraPosition ? "Hide Camera" : "Show Camera" }}
-      </button>
+          <button @click="GetSpheres" class="action-btn secondary-btn">
+            <span class="btn-icon"></span>
+            <span>Load Spheres</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Frame Averaging Control -->
+      <div class="frame-avg-control">
+        <label>Frame Averaging:</label>
+        <div class="slider-with-number">
+          <input type="range" v-model.number="framesToAverage" min="1" max="32" step="1" />
+          <input type="number" v-model.number="framesToAverage" min="1" max="32" step="1" class="frame-number-input" />
+        </div>
+      </div>
     </div>
 
     <!-- Image display with conditional rendering -->
     <div v-if="showImage" class="image-container">
       <h4>Current Rendered Image</h4>
-      <canvas
-        ref="currentImageCanvas"
-        width="800"
-        height="600"
-        class="render-canvas"
-      ></canvas>
+      <canvas ref="currentImageCanvas" width="800" height="600" class="render-canvas"></canvas>
     </div>
 
     <!-- Camera Positions with conditional rendering -->
     <div v-if="showCameraPosition" class="camera-position-container">
-      <div
-        v-for="cameraPosition in cameraPositions"
-        :key="cameraPosition"
-        class="camera-position-card"
-      >
+      <div v-for="cameraPosition in cameraPositions" :key="cameraPosition" class="camera-position-card">
         <div class="position-group">
           <div class="position-item">
             <span class="position-label">X:</span>
             <span class="position-value">{{
               cameraPosition.x.toFixed(2)
-            }}</span>
+              }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Y:</span>
             <span class="position-value">{{
               cameraPosition.y.toFixed(2)
-            }}</span>
+              }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Z:</span>
             <span class="position-value">{{
               cameraPosition.z.toFixed(2)
-            }}</span>
+              }}</span>
           </div>
         </div>
         <div class="axis-group">
@@ -67,13 +85,13 @@
             <span class="position-label">X-Axis:</span>
             <span class="position-value">{{
               cameraPosition.cameraX.toFixed(2)
-            }}</span>
+              }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Y-Axis:</span>
             <span class="position-value">{{
               cameraPosition.cameraY.toFixed(2)
-            }}</span>
+              }}</span>
           </div>
         </div>
         <button @click="moveToPosition(cameraPosition)" class="btn">
@@ -86,57 +104,26 @@
       <!-- Main Parameters Section -->
       <div class="option-card">
         <h4>Main Parameters</h4>
-        <div
-          class="slider-group"
-          v-for="param in exponentialParams"
-          :key="param.name"
-        >
+        <div class="slider-group" v-for="param in exponentialParams" :key="param.name">
           <div class="slider-with-input">
             <label>{{ param.name }}</label>
             <div class="controls">
-              <input
-                type="range"
-                v-model.number="param.value"
-                :min="0"
-                :max="10"
-                step="1"
-                @input="updateExponentialValue(param)"
-              />
-              <input
-                type="number"
-                v-model.number="param.actualValue"
-                @input="updateSliderValue(param)"
-                class="number-input"
-              />
+              <input type="range" v-model.number="param.value" :min="0" :max="10" step="1"
+                @input="updateExponentialValue(param)" />
+              <input type="number" v-model.number="param.actualValue" @input="updateSliderValue(param)"
+                class="number-input" />
             </div>
           </div>
         </div>
 
         <!-- Sliders Section -->
         <h4>Lighting Parameters</h4>
-        <div
-          class="slider-with-input"
-          v-for="slider in sliders"
-          :key="slider.name"
-        >
+        <div class="slider-with-input" v-for="slider in sliders" :key="slider.name">
           <label>{{ slider.name }}</label>
           <div class="controls">
-            <input
-              v-if="slider.name == 'Light Intensity'"
-              type="range"
-              v-model="slider.value"
-              min="0"
-              max="32"
-              step="0.1"
-            />
-            <input
-              v-else
-              type="range"
-              v-model="slider.value"
-              min="0"
-              max="256"
-              step="1"
-            />
+            <input v-if="slider.name == 'Light Intensity'" type="range" v-model="slider.value" min="0" max="32"
+              step="0.1" />
+            <input v-else type="range" v-model="slider.value" min="0" max="256" step="1" />
             <input type="number" v-model="slider.value" class="number-input" />
           </div>
         </div>
@@ -145,13 +132,7 @@
         <div class="slider-with-input">
           <label>FOV</label>
           <div class="controls">
-            <input
-              type="range"
-              v-model.number="FOV"
-              min="15"
-              max="120"
-              step="1"
-            />
+            <input type="range" v-model.number="FOV" min="15" max="120" step="1" />
             <input type="number" v-model.number="FOV" class="number-input" />
           </div>
         </div>
@@ -161,19 +142,8 @@
         <div class="slider-with-input">
           <label>Gamma</label>
           <div class="controls">
-            <input
-              type="range"
-              v-model.number="gamma"
-              min="0"
-              max="1"
-              step="0.001"
-            />
-            <input
-              type="number"
-              v-model.number="gamma"
-              step="0.1"
-              class="number-input"
-            />
+            <input type="range" v-model.number="gamma" min="0" max="1" step="0.001" />
+            <input type="number" v-model.number="gamma" step="0.1" class="number-input" />
           </div>
         </div>
       </div>
@@ -182,11 +152,7 @@
       <div class="option-card">
         <h4>Render Settings</h4>
         <div class="options-flex">
-          <div
-            class="select-group"
-            v-for="option in binaryOptions"
-            :key="option.name"
-          >
+          <div class="select-group" v-for="option in binaryOptions" :key="option.name">
             <label>{{ option.name }}</label>
             <select v-model="option.value">
               <option value="yes">Yes</option>
@@ -196,7 +162,9 @@
 
           <div class="select-group">
             <label>Mode</label>
-            <select v-if="['V2-Log', 'V2-Linear', 'V2-Linear-Texture', 'V2-Log-Texture', 'V4-Log', 'V4-Linear'].includes(renderVersion)" v-model="selectedMode">
+            <select
+              v-if="['V2-Log', 'V2-Linear', 'V2-Linear-Texture', 'V2-Log-Texture', 'V4-Log', 'V4-Linear'].includes(renderVersion)"
+              v-model="selectedMode">
               <option v-for="mode in modes" :key="mode" :value="mode">
                 {{ mode }}
               </option>
@@ -216,11 +184,7 @@
           <div class="select-group">
             <label>Version</label>
             <select v-model="renderVersion">
-              <option
-                v-for="version in renderVersions"
-                :key="version"
-                :value="version"
-              >
+              <option v-for="version in renderVersions" :key="version" :value="version">
                 {{ version }}
               </option>
             </select>
@@ -228,11 +192,7 @@
           <div class="select-group">
             <label>Version</label>
             <select v-model="RaymarchingVersion">
-              <option
-                v-for="version in RaymarchingVersions"
-                :key="version"
-                :value="version"
-              >
+              <option v-for="version in RaymarchingVersions" :key="version" :value="version">
                 {{ version }}
               </option>
             </select>
@@ -245,44 +205,34 @@
         <div class="sphere-list">
           <div v-for="(sphere, index) in spheres[0]" :key="index" class="sphere-item">
             <div class="sphere-header">
-              <h5 class="sphere-title">Sphere {{index}}</h5>
-              <div class="sphere-color-preview" 
-                :style="{backgroundColor: `rgb(${sphere.colorR || 0}, ${sphere.colorG || 0}, ${sphere.colorB || 0})`}">
+              <h5 class="sphere-title">Sphere {{ index }}</h5>
+              <div class="sphere-color-preview"
+                :style="{ backgroundColor: `rgb(${sphere.colorR || 0}, ${sphere.colorG || 0}, ${sphere.colorB || 0})` }">
               </div>
             </div>
-            
+
             <!-- Position Controls with +/- buttons -->
             <div class="sphere-control-group">
               <div class="control-label">Position</div>
               <div class="position-controls">
                 <div class="axis-control" v-for="axis in ['X', 'Y', 'Z']" :key="axis">
-                  <label>{{axis}}</label>
+                  <label>{{ axis }}</label>
                   <div class="position-input-group">
-                    <button @click="adjustPosition(sphere, `center${axis}`, -0.5, index)" class="position-btn">−</button>
-                    <input 
-                      type="number" 
-                      v-model.number="sphere[`center${axis}`]" 
-                      step="0.1" 
-                      class="position-input" 
-                    />
+                    <button @click="adjustPosition(sphere, `center${axis}`, -0.5, index)"
+                      class="position-btn">−</button>
+                    <input type="number" v-model.number="sphere[`center${axis}`]" step="0.1" class="position-input" />
                     <button @click="adjustPosition(sphere, `center${axis}`, 0.5, index)" class="position-btn">+</button>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <!-- Radius Control -->
             <div class="sphere-control-group">
               <div class="control-label">Radius</div>
               <div class="radius-input-group">
                 <button @click="adjustPosition(sphere, 'radius', -1, index)" class="position-btn">−</button>
-                <input 
-                  type="number" 
-                  v-model.number="sphere.radius" 
-                  min="0.1" 
-                  step="0.1" 
-                  class="radius-input" 
-                />
+                <input type="number" v-model.number="sphere.radius" min="0.1" step="0.1" class="radius-input" />
                 <button @click="adjustPosition(sphere, 'radius', 1, index)" class="position-btn">+</button>
               </div>
             </div>
@@ -292,63 +242,47 @@
               <div class="control-label">Amount</div>
               <div class="position-input-group">
                 <button @click="adjustPosition(sphere, 'amount', -1, index)" class="position-btn">−</button>
-                <input 
-                  type="number" 
-                  v-model.number="sphere.amount" 
-                  step="0.1" 
-                  class="position-input" 
-                />
+                <input type="number" v-model.number="sphere.amount" step="0.1" class="position-input" />
                 <button @click="adjustPosition(sphere, 'amount', 1, index)" class="position-btn">+</button>
               </div>
             </div>
-            
+
             <!-- Color Controls -->
             <div class="sphere-control-group">
               <div class="control-label">Color</div>
               <div class="color-controls">
                 <div class="color-slider" v-for="colorName in ['R', 'G', 'B', 'A']" :key="colorName">
-                  <span class="color-label">{{colorName}}</span>
+                  <span class="color-label">{{ colorName }}</span>
                   <div class="color-input-group">
-                    <input 
-                      type="range" 
-                      v-model.number="sphere[`color${colorName}`]" 
-                      min="0" 
-                      max="255" 
-                      step="1" 
-                      class="color-range" 
-                    />
-                    <input 
-                      type="number" 
-                      v-model.number="sphere[`color${colorName}`]" 
-                      min="0" 
-                      max="255" 
-                      class="color-value" 
-                    />
+                    <input type="range" v-model.number="sphere[`color${colorName}`]" min="0" max="255" step="1"
+                      class="color-range" />
+                    <input type="number" v-model.number="sphere[`color${colorName}`]" min="0" max="255"
+                      class="color-value" />
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <!-- SDF Type Controls -->
             <div class="sphere-control-group" v-if="'sdfType' in sphere">
               <div class="control-label">SDF Type</div>
               <select v-model.number="sphere.sdfType" class="sdf-select">
                 <option v-for="(value, name) in types" :key="name" :value="value">
-                  {{name}}
+                  {{ name }}
                 </option>
               </select>
             </div>
-            
+
             <!-- Other Sphere Index -->
-            <div class="sphere-control-group" v-if="'indexOfOtherSphere'  && sphere.sdfType != 'distance' in sphere">
+            <div class="sphere-control-group" v-if="'indexOfOtherSphere' && sphere.sdfType != 'distance' in sphere">
               <div class="control-label">Related Sphere</div>
               <select v-model.number="sphere.indexOfOtherSphere" class="sdf-select">
-                <option v-for="i in spheres[0].length" :key="i-1" :value="i-1">
-                  Sphere {{i-1}}
+                <option v-for="i in spheres[0].length" :key="i - 1" :value="i - 1">
+                  Sphere {{ i - 1 }}
                 </option>
               </select>
             </div>
-            
+
             <button @click="updateSphere(index)" class="update-sphere-btn">Update Sphere</button>
           </div>
         </div>
@@ -371,6 +305,7 @@ export default {
 
   data() {
     return {
+      framesToAverage: 3,
       showImage: false,
       showCameraPosition: false,
       exponentialParams: [
@@ -378,7 +313,7 @@ export default {
         { name: "Scatter", value: 0, actualValue: 0 },
       ],
       binaryOptions: [
-        { name : 'Paint Texture', value: "no"},
+        { name: 'Paint Texture', value: "no" },
         { name: "Snap Light to Camera", value: "no" },
         { name: "Raymarching", value: "no" },
         { name: "Performance Mode", value: "no" },
@@ -406,8 +341,8 @@ export default {
         "V4-Linear-Optim-V2",
         "V4-Optim-V2"
       ],
-      RaymarchingVersions: ["V1","V2"],
-      RaymarchingVersion : "V2",
+      RaymarchingVersions: ["V1", "V2"],
+      RaymarchingVersion: "V2",
       gamma: 0.25,
       sliders: [
         { name: "Light Intensity", value: 3 },
@@ -416,8 +351,8 @@ export default {
         { name: "B", value: 1 },
       ],
       currentImage: false,
-      spheres : [],
-      types : {}
+      spheres: [],
+      types: {}
     };
   },
   methods: {
@@ -457,12 +392,25 @@ export default {
     },
     GetRenderedImage() {
       this.SubmitRenderOptions();
-      this.UpdateImage();
-      // wait for the image to be rendered
+
+      // Show loading indicator
+      const canvas = this.$refs.currentImageCanvas;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = '#333';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font = '20px Arial';
+        ctx.fillText('Rendering...', canvas.width / 2 - 60, canvas.height / 2);
+      }
+
       setTimeout(() => {
         axios
-          .get(`${this.apiAddress}/sendImage`, {
-            responseType: "arraybuffer", // Request as binary data
+          .get(`${this.apiAddress}/getCurrentImage`, {
+            params: {
+              frames: this.framesToAverage
+            },
+            responseType: 'arraybuffer'  // This is critical for binary data
           })
           .then((response) => {
             // Convert arraybuffer to blob
@@ -472,7 +420,6 @@ export default {
             const imageUrl = URL.createObjectURL(blob);
 
             // Get canvas and context
-            const canvas = this.$refs.currentImageCanvas;
             if (!canvas) {
               console.error("Canvas element not found");
               return;
@@ -486,6 +433,7 @@ export default {
 
             // Load image with created URL
             const image = new Image();
+
             image.onload = () => {
               ctx.clearRect(0, 0, canvas.width, canvas.height);
               ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -498,27 +446,43 @@ export default {
             image.onerror = (err) => {
               console.error("Image failed to load:", err);
               URL.revokeObjectURL(imageUrl);
+
+              // Show error message on canvas
+              ctx.fillStyle = '#333';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.fillStyle = '#ff5555';
+              ctx.font = '16px Arial';
+              ctx.fillText('Error loading image', canvas.width / 2 - 70, canvas.height / 2);
             };
 
             image.src = imageUrl;
           })
           .catch((error) => {
             console.error("API error:", error);
+
+            // Show error message on canvas
+            if (canvas) {
+              const ctx = canvas.getContext("2d");
+              ctx.fillStyle = '#333';
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.fillStyle = '#ff5555';
+              ctx.font = '16px Arial';
+              ctx.fillText(`API Error: ${error.message}`, canvas.width / 2 - 100, canvas.height / 2);
+            }
           });
-      }, 2500);
+      }, 1000);
     },
 
-    UpdateImage() {
-      axios
-        .get(`${this.apiAddress}/getCurrentImage`)
-        .then((response) => {
-          console.log(response.data);
-          this.cameraPositions.push(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
+    // UpdateImage() {
+    //   axios
+    //     .get(`${this.apiAddress}/getCurrentImage`)
+    //     .then((response) => {
+    //       console.log(response.data);
+    //     })
+    //     .catch((error) => {
+    //       console.error(error);
+    //     });
+    // },
 
     moveToPosition(cameraPosition) {
       axios
@@ -1031,5 +995,129 @@ label {
   color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 500;
+}
+
+/* Add these styles to the top of your existing <style> section */
+
+.header-section {
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-unit);
+  margin-bottom: var(--spacing-unit);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.controls-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing-unit) * 0.8);
+  margin: var(--spacing-unit) 0;
+}
+
+.button-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: var(--bg-secondary);
+  padding: 8px;
+  border-radius: calc(var(--border-radius) * 0.7);
+  flex: 1;
+  min-width: 280px;
+}
+
+.action-btn {
+  padding: 8px 12px;
+  border-radius: calc(var(--border-radius) * 0.7);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+  min-width: 90px;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--accent-primary), #3a8eef);
+  color: white;
+}
+
+.secondary-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toggle-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-primary);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, #3a8eef, var(--accent-primary));
+}
+
+.secondary-btn:hover,
+.toggle-btn:hover {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+.frame-avg-control {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  background: var(--bg-secondary);
+  padding: 10px;
+  border-radius: calc(var(--border-radius) * 0.7);
+  margin-top: 12px;
+}
+
+.slider-with-number {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.frame-number-input {
+  width: 50px;
+  padding: 4px;
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-primary);
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .controls-container {
+    flex-direction: column;
+  }
+
+  .button-panel {
+    width: 100%;
+  }
+
+  .frame-avg-control {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
