@@ -59,44 +59,81 @@
 
     <!-- Camera Positions with conditional rendering -->
     <div v-if="showCameraPosition" class="camera-position-container">
-      <div v-for="cameraPosition in cameraPositions" :key="cameraPosition" class="camera-position-card">
+      <div class="camera-controls">
+        <h4>Camera Positions</h4>
+        <div class="camera-actions">
+          <button @click="selectAllCameras" class="action-btn secondary-btn">
+            <span>Select All</span>
+          </button>
+          <button @click="clearCameraSelection" class="action-btn secondary-btn">
+            <span>Clear Selected</span>
+          </button>
+        </div>
+        <div class="camera-actions">
+          <button @click="moveCamera" class="action-btn primary-btn">
+            <span>Interpolate between Position</span>
+          </button>
+        </div>
+
+        <!-- slider for time duration -->
+        <div class="frame-avg-control">
+          <label>Time Duration:</label>
+          <div class="slider-with-number">
+            <input type="range" v-model.number="renderDuration" min="1" max="32" step="1" />
+            <input type="number" v-model.number="renderDuration" min="1" max="32" step="1" class="frame-number-input" />
+          </div>
+        </div>
+
+      </div>
+      
+      <div v-for="(cameraPosition, index) in cameraPositions" :key="index" 
+           class="camera-position-card"
+           :class="{ 'camera-selected': isCameraSelected(cameraPosition) }">
+        <div class="camera-header">
+          <div class="camera-title">
+            <span class="position-label">Camera #{{ index + 1 }}</span>
+          </div>
+          <div class="camera-actions">
+            <button @click="toggleCameraSelection(cameraPosition)" class="camera-select-btn">
+              {{ isCameraSelected(cameraPosition) ? '✓ Selected' : 'Select' }}
+            </button>
+          </div>
+        </div>
+        
         <div class="position-group">
           <div class="position-item">
             <span class="position-label">X:</span>
-            <span class="position-value">{{
-              cameraPosition.x.toFixed(2)
-              }}</span>
+            <span class="position-value">{{ cameraPosition.x.toFixed(2) }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Y:</span>
-            <span class="position-value">{{
-              cameraPosition.y.toFixed(2)
-              }}</span>
+            <span class="position-value">{{ cameraPosition.y.toFixed(2) }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Z:</span>
-            <span class="position-value">{{
-              cameraPosition.z.toFixed(2)
-              }}</span>
+            <span class="position-value">{{ cameraPosition.z.toFixed(2) }}</span>
           </div>
         </div>
+        
         <div class="axis-group">
           <div class="position-item">
             <span class="position-label">X-Axis:</span>
-            <span class="position-value">{{
-              cameraPosition.cameraX.toFixed(2)
-              }}</span>
+            <span class="position-value">{{ cameraPosition.cameraX.toFixed(2) }}</span>
           </div>
           <div class="position-item">
             <span class="position-label">Y-Axis:</span>
-            <span class="position-value">{{
-              cameraPosition.cameraY.toFixed(2)
-              }}</span>
+            <span class="position-value">{{ cameraPosition.cameraY.toFixed(2) }}</span>
           </div>
         </div>
-        <button @click="moveToPosition(cameraPosition)" class="btn">
-          Move to Position
-        </button>
+        
+        <div class="camera-actions">
+          <button @click="moveToPosition(cameraPosition)" class="btn camera-action-btn">
+            Move to Position
+          </button>
+          <button @click="removeCameraPosition(index)" class="btn camera-action-btn remove-btn">
+            Remove
+          </button>
+        </div>
       </div>
     </div>
 
@@ -305,6 +342,7 @@ export default {
 
   data() {
     return {
+      renderDuration: 10,
       framesToAverage: 3,
       showImage: false,
       showCameraPosition: false,
@@ -319,6 +357,8 @@ export default {
         { name: "Performance Mode", value: "no" },
       ],
       cameraPositions: [],
+      selectedCameraPosition: [],
+      selectedCameraPositions: [], // Array to hold selected camera positions
       FOV: 35,
       resolution: "2X",
       resolutions: ["Native", "2X", "4X", "8X"],
@@ -356,6 +396,20 @@ export default {
     };
   },
   methods: {
+    moveCamera() {
+      const response = {
+        positions : this.selectedCameraPositions,
+        timeDuration : this.renderDuration
+      }
+      axios
+        .post(`${this.apiAddress}/moveCamera`, response)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     updateSphere(index) {
       let sphere = this.spheres[0][index];
       sphere.index = index;
@@ -408,7 +462,7 @@ export default {
         axios
           .get(`${this.apiAddress}/getCurrentImage`, {
             params: {
-              frames: this.framesToAverage
+              frames: this.framesToAverage,
             },
             responseType: 'arraybuffer'  // This is critical for binary data
           })
@@ -558,6 +612,87 @@ export default {
       sphere[property] += amount;
       this.updateSphere(index);
     },
+    // Toggle camera selection
+    toggleCameraSelection(cameraPosition) {
+      const index = this.selectedCameraPositions.findIndex(
+        pos => this.isSamePosition(pos, cameraPosition)
+      );
+      
+      if (index === -1) {
+        // Add to selection
+        this.selectedCameraPositions.push(cameraPosition);
+      } else {
+        // Remove from selection
+        this.selectedCameraPositions.splice(index, 1);
+      }
+    },
+    
+    // Check if a camera is currently selected
+    isCameraSelected(cameraPosition) {
+      return this.selectedCameraPositions.some(
+        pos => this.isSamePosition(pos, cameraPosition)
+      );
+    },
+    
+    // Helper to compare camera positions
+    isSamePosition(pos1, pos2) {
+      return (
+        pos1.x === pos2.x && 
+        pos1.y === pos2.y && 
+        pos1.z === pos2.z &&
+        pos1.cameraX === pos2.cameraX &&
+        pos1.cameraY === pos2.cameraY
+      );
+    },
+    
+    // Select all cameras
+    selectAllCameras() {
+      this.selectedCameraPositions = [...this.cameraPositions];
+    },
+    
+    // Clear camera selection
+    clearCameraSelection() {
+      this.selectedCameraPositions = [];
+    },
+    
+    // Remove camera position from the list
+    removeCameraPosition(index) {
+      // Remove from selection if it's there
+      const removed = this.cameraPositions[index];
+      const selIndex = this.selectedCameraPositions.findIndex(
+        pos => this.isSamePosition(pos, removed)
+      );
+      
+      if (selIndex !== -1) {
+        this.selectedCameraPositions.splice(selIndex, 1);
+      }
+      
+      // Remove from main list
+      this.cameraPositions.splice(index, 1);
+    },
+    
+    // Move to all selected positions in sequence
+    moveToSelectedPositions() {
+      if (this.selectedCameraPositions.length === 0) return;
+      
+      // Implementation options:
+      // 1. Move to first selected position
+      this.moveToPosition(this.selectedCameraPositions[0]);
+      
+      // OR 2. Move through all positions with some delay
+      // this.moveToMultiplePositions(0);
+    },
+    
+    // Optional: move through multiple positions in sequence
+    moveToMultiplePositions(index) {
+      if (index >= this.selectedCameraPositions.length) return;
+      
+      this.moveToPosition(this.selectedCameraPositions[index]);
+      
+      setTimeout(() => {
+        this.moveToMultiplePositions(index + 1);
+      }, 1000); // 1 second delay between moves
+    }
   },
 };
 </script>
@@ -721,7 +856,7 @@ label {
 
 .camera-position-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--spacing-unit);
   margin-bottom: var(--spacing-unit);
   animation: slideDown 0.3s ease-out;
