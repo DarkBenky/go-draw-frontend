@@ -58,81 +58,96 @@
     </div>
 
     <!-- Camera Positions with conditional rendering -->
-    <div v-if="showCameraPosition" class="camera-position-container">
-      <div class="camera-controls">
+    <div v-if="showCameraPosition" class="camera-position-section">
+      <div class="camera-controls-header">
         <h4>Camera Positions</h4>
-        <div class="camera-actions">
-          <button @click="selectAllCameras" class="action-btn secondary-btn">
+        <div class="camera-control-buttons">
+          <button @click="selectAllCameras" class="control-btn select-btn">
+            <!-- <span class="btn-icon">☑️</span>span> -->
             <span>Select All</span>
           </button>
-          <button @click="clearCameraSelection" class="action-btn secondary-btn">
+          <button @click="clearCameraSelection" class="control-btn clear-btn">
+            <!-- <span class="btn-icon">❌</span>span> -->
             <span>Clear Selected</span>
           </button>
         </div>
-        <div class="camera-actions">
-          <button @click="moveCamera" class="action-btn primary-btn">
-            <span>Interpolate between Position</span>
-          </button>
-        </div>
-
-        <!-- slider for time duration -->
-        <div class="frame-avg-control">
-          <label>Time Duration:</label>
-          <div class="slider-with-number">
-            <input type="range" v-model.number="renderDuration" min="1" max="32" step="1" />
-            <input type="number" v-model.number="renderDuration" min="1" max="32" step="1" class="frame-number-input" />
-          </div>
-        </div>
-
       </div>
-      
-      <div v-for="(cameraPosition, index) in cameraPositions" :key="index" 
-           class="camera-position-card"
-           :class="{ 'camera-selected': isCameraSelected(cameraPosition) }">
-        <div class="camera-header">
-          <div class="camera-title">
-            <span class="position-label">Camera #{{ index + 1 }}</span>
+
+      <div class="interpolation-controls">
+        <button @click="moveCamera" class="control-btn interpolate-btn">
+          <!-- <span class="btn-icon">🎥</span> -->
+          <span>Interpolate Between Positions</span>
+        </button>
+        
+        <div class="duration-control">
+          <label>Duration (s):</label>
+          <div class="duration-inputs">
+            <input 
+              type="range" 
+              v-model.number="renderDuration" 
+              min="1" 
+              max="32" 
+              step="1"
+              class="duration-slider" 
+            />
+            <input 
+              type="number" 
+              v-model.number="renderDuration" 
+              min="1" 
+              max="32" 
+              step="1" 
+              class="duration-input" 
+            />
           </div>
-          <div class="camera-actions">
-            <button @click="toggleCameraSelection(cameraPosition)" class="camera-select-btn">
+        </div>
+      </div>
+
+      <div class="camera-positions-grid">
+        <div 
+          v-for="(cameraPosition, index) in cameraPositions" 
+          :key="index" 
+          class="camera-card"
+          :class="{ 'selected': isCameraSelected(cameraPosition) }"
+        >
+          <div class="camera-card-header">
+            <span class="camera-index">Camera #{{ index + 1 }}</span>
+            <button 
+              @click="toggleCameraSelection(cameraPosition)" 
+              class="select-camera-btn"
+              :class="{ 'selected': isCameraSelected(cameraPosition) }"
+            >
               {{ isCameraSelected(cameraPosition) ? '✓ Selected' : 'Select' }}
             </button>
           </div>
-        </div>
-        
-        <div class="position-group">
-          <div class="position-item">
-            <span class="position-label">X:</span>
-            <span class="position-value">{{ cameraPosition.x.toFixed(2) }}</span>
+
+          <div class="camera-coordinates">
+            <div class="coordinate-group">
+              <span class="coordinate-label">Position:</span>
+              <div class="coordinate-values">
+                <span class="coordinate">X: {{ cameraPosition.x.toFixed(2) }}</span>
+                <span class="coordinate">Y: {{ cameraPosition.y.toFixed(2) }}</span>
+                <span class="coordinate">Z: {{ cameraPosition.z.toFixed(2) }}</span>
+              </div>
+            </div>
+            <div class="coordinate-group">
+              <span class="coordinate-label">Rotation:</span>
+              <div class="coordinate-values">
+                <span class="coordinate">X: {{ cameraPosition.cameraX.toFixed(2) }}</span>
+                <span class="coordinate">Y: {{ cameraPosition.cameraY.toFixed(2) }}</span>
+              </div>
+            </div>
           </div>
-          <div class="position-item">
-            <span class="position-label">Y:</span>
-            <span class="position-value">{{ cameraPosition.y.toFixed(2) }}</span>
+
+          <div class="camera-actions">
+            <button @click="moveToPosition(cameraPosition)" class="action-btn move-btn">
+              <span class="btn-icon">📍</span>
+              Move Here
+            </button>
+            <button @click="removeCameraPosition(index)" class="action-btn delete-btn">
+              <span class="btn-icon">🗑️</span>
+              Remove
+            </button>
           </div>
-          <div class="position-item">
-            <span class="position-label">Z:</span>
-            <span class="position-value">{{ cameraPosition.z.toFixed(2) }}</span>
-          </div>
-        </div>
-        
-        <div class="axis-group">
-          <div class="position-item">
-            <span class="position-label">X-Axis:</span>
-            <span class="position-value">{{ cameraPosition.cameraX.toFixed(2) }}</span>
-          </div>
-          <div class="position-item">
-            <span class="position-label">Y-Axis:</span>
-            <span class="position-value">{{ cameraPosition.cameraY.toFixed(2) }}</span>
-          </div>
-        </div>
-        
-        <div class="camera-actions">
-          <button @click="moveToPosition(cameraPosition)" class="btn camera-action-btn">
-            Move to Position
-          </button>
-          <button @click="removeCameraPosition(index)" class="btn camera-action-btn remove-btn">
-            Remove
-          </button>
         </div>
       </div>
     </div>
@@ -1118,7 +1133,7 @@ label {
 .color-value {
   width: 60px;
   padding: 4px;
-  background: var(--bg-secondary);
+  background: var (--bg-secondary);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   color: var(--text-primary);
@@ -1252,6 +1267,235 @@ label {
   }
 
   .frame-avg-control {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Add these styles to your <style> section */
+.camera-position-section {
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-unit);
+  margin: var(--spacing-unit) 0;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.camera-controls-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.camera-control-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.select-btn {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.clear-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.interpolate-btn {
+  background: linear-gradient(135deg, var(--accent-primary), #3a8eef);
+  color: white;
+  border: none;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.duration-control {
+  background: var(--bg-secondary);
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+.duration-inputs {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.duration-slider {
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-primary), #3a8eef);
+  border-radius: 2px;
+  appearance: none;
+}
+
+.duration-input {
+  width: 60px;
+  padding: 4px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text-primary);
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.camera-positions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.camera-card {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.camera-card.selected {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary);
+}
+
+.camera-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.camera-index {
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.select-camera-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--accent-primary);
+  background: transparent;
+  color: var(--accent-primary);
+}
+
+.select-camera-btn.selected {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.camera-coordinates {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.coordinate-group {
+  background: var(--bg-tertiary);
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.coordinate-label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.coordinate-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.coordinate {
+  background: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9rem;
+  color: var(--accent-primary);
+}
+
+.camera-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.move-btn {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+}
+
+.delete-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.delete-btn:hover {
+  background: rgb(220, 53, 69);
+  color: white;
+  border-color: transparent;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .camera-controls-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .camera-control-buttons {
+    flex-direction: column;
+  }
+  
+  .camera-positions-grid {
     grid-template-columns: 1fr;
   }
 }
