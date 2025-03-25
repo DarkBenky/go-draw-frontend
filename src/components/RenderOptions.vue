@@ -63,11 +63,9 @@
         <h4>Camera Positions</h4>
         <div class="camera-control-buttons">
           <button @click="selectAllCameras" class="control-btn select-btn">
-            <!-- <span class="btn-icon">☑️</span>span> -->
             <span>Select All</span>
           </button>
           <button @click="clearCameraSelection" class="control-btn clear-btn">
-            <!-- <span class="btn-icon">❌</span>span> -->
             <span>Clear Selected</span>
           </button>
         </div>
@@ -75,7 +73,6 @@
 
       <div class="interpolation-controls">
         <button @click="moveCamera" class="control-btn interpolate-btn">
-          <!-- <span class="btn-icon">🎥</span> -->
           <span>Interpolate Between Positions</span>
         </button>
         
