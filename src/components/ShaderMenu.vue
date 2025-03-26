@@ -187,7 +187,7 @@
                 </div>
                 <div class="control-group">
                     <label>Glow:</label>
-                    <input type="range" v-model.number="selectedShader.Glow" min="0" max="8" step="0.01" />
+                    <input type="range" v-model.number="selectedShader.Glow" min="0" max="80" step="0.01" />
                     <span>{{ selectedShader.Glow.toFixed(2) }}</span>
                 </div>
                 <div class="control-group">

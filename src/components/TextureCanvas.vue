@@ -17,9 +17,9 @@
             <button @click="openNormalMapGenerator" class="custom-file-upload tool-button">
                 No Normals?
             </button>
-            <button @click="openNormalMapGenerator" class="custom-file-upload tool-button">
+            <!-- <button @click="openNormalMapGenerator" class="custom-file-upload tool-button">
                 Project Render to Texture
-            </button>
+            </button> -->
         </div>
         <div class="texture-editor">
             <div class="texture-list">
