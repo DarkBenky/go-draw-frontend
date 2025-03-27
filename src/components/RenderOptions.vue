@@ -246,6 +246,14 @@
               </option>
             </select>
           </div>
+          <div class="select-group">
+            <label>Version</label>
+            <select v-model="VolumeRenderingVersion">
+              <option v-for="version in VolumeRenderingVersions" :key="version" :value="version">
+                {{ version }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -394,6 +402,8 @@ export default {
         "V4-Optim-V2"
       ],
       RaymarchingVersions: ["V1", "V2"],
+      VolumeRenderingVersion: "V1",
+      VolumeRenderingVersions: ["V1", "V2"],
       RaymarchingVersion: "V2",
       gamma: 0.25,
       sliders: [
@@ -604,6 +614,7 @@ export default {
         b: Number(this.sliders[3].value),
         paintTexture: this.binaryOptions[0].value,
         rayMarchingVersion: this.RaymarchingVersion,
+        volumeRenderingVersion: this.VolumeRenderingVersion,
       };
       axios
         .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)
