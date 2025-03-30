@@ -11,6 +11,13 @@
             <span>Submit</span>
           </button>
 
+          <button @click="LockCamera" class="action-btn primary-btn">
+            <span class="btn-icon"></span>
+            <span v-if="lockedCamera">Unlock Camera</span>
+            <span v-else>Lock Camera</span>
+          </button>
+
+
           <button @click="GetRenderedImage" class="action-btn primary-btn">
             <span class="btn-icon"></span>
             <span>Get Image</span>
@@ -414,10 +421,22 @@ export default {
       ],
       currentImage: false,
       spheres: [],
-      types: {}
+      types: {},
+      lockedCamera : false
     };
   },
   methods: {
+    LockCamera() {
+      this.lockedCamera = !this.lockedCamera;
+      axios
+        .post(`${this.apiAddress}/lockCamera`, {lockedCamera : this.lockedCamera})
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     moveCamera() {
       const response = {
         positions : this.selectedCameraPositions,
