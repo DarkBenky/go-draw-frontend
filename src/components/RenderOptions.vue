@@ -422,7 +422,9 @@ export default {
       currentImage: false,
       spheres: [],
       types: {},
-      lockedCamera : false
+      lockedCamera : false,
+      remainingTime : 0,
+      remainingImages : 0,
     };
   },
   methods: {
@@ -485,6 +487,20 @@ export default {
           console.error(error);
         });
     },
+    getRemainingTime() {
+      console.log("getting remaining Time")
+      axios.get(`${this.apiAddress}/getRemainingTime`)
+        .then((response) => {
+          console.log(response.data);
+          this.remainingImages = response.data.remainingFrames;
+          this.remainingTime = response.data.remainingTime * 0.75 + this.remainingTime * 0.25;
+          
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
     GetRenderedImage() {
       this.SubmitRenderOptions();
 
@@ -499,6 +515,30 @@ export default {
         ctx.fillText('Rendering...', canvas.width / 2 - 60, canvas.height / 2);
       }
 
+      // Start periodic status checks
+      this.statusInterval = setInterval(() => {
+        this.getRemainingTime();
+        
+        // Update the canvas with status information
+        if (canvas) {
+          const ctx = canvas.getContext("2d");
+          
+          // Draw background
+          ctx.fillStyle = '#333';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Draw rendering status
+          ctx.fillStyle = '#fff';
+          ctx.font = '20px Arial';
+          ctx.fillText('Rendering...', canvas.width / 2 - 60, canvas.height / 2 - 30);
+          
+          // Draw remaining time info
+          ctx.font = '16px Arial';
+          ctx.fillText(`Remaining Frames: ${this.remainingImages.toFixed(2)}`, canvas.width / 2 - 80, canvas.height / 2 + 10);
+          ctx.fillText(`Estimated Time: ${this.remainingTime.toFixed(2)} seconds`, canvas.width / 2 - 100, canvas.height / 2 + 40);
+        }
+      }, 500); // Check every 0.5 seconds
+
       setTimeout(() => {
         axios
           .get(`${this.apiAddress}/getCurrentImage`, {
@@ -508,6 +548,9 @@ export default {
             responseType: 'arraybuffer'  // This is critical for binary data
           })
           .then((response) => {
+            // Stop periodic status checks
+            clearInterval(this.statusInterval);
+            
             // Convert arraybuffer to blob
             const blob = new Blob([response.data], { type: "image/png" });
 
@@ -553,6 +596,9 @@ export default {
             image.src = imageUrl;
           })
           .catch((error) => {
+            // Stop periodic status checks
+            clearInterval(this.statusInterval);
+            
             console.error("API error:", error);
 
             // Show error message on canvas
