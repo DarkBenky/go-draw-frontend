@@ -11,6 +11,13 @@
             <span>Submit</span>
           </button>
 
+          <button @click="LockCamera" class="action-btn primary-btn">
+            <span class="btn-icon"></span>
+            <span v-if="lockedCamera">Unlock Camera</span>
+            <span v-else>Lock Camera</span>
+          </button>
+
+
           <button @click="GetRenderedImage" class="action-btn primary-btn">
             <span class="btn-icon"></span>
             <span>Get Image</span>
@@ -235,6 +242,14 @@
               </option>
             </select>
           </div>
+          <div class="select-group">
+            <label>Version</label>
+            <select v-model="VolumeRenderingVersion">
+              <option v-for="version in VolumeRenderingVersions" :key="version" :value="version">
+                {{ version }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -383,6 +398,8 @@ export default {
         "V4-Optim-V2"
       ],
       RaymarchingVersions: ["V1", "V2"],
+      VolumeRenderingVersion: "V1",
+      VolumeRenderingVersions: ["V1", "V2"],
       RaymarchingVersion: "V2",
       gamma: 0.25,
       sliders: [
@@ -393,10 +410,24 @@ export default {
       ],
       currentImage: false,
       spheres: [],
-      types: {}
+      types: {},
+      lockedCamera : false,
+      remainingTime : 0,
+      remainingImages : 0,
     };
   },
   methods: {
+    LockCamera() {
+      this.lockedCamera = !this.lockedCamera;
+      axios
+        .post(`${this.apiAddress}/lockCamera`, {lockedCamera : this.lockedCamera})
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     moveCamera() {
       const response = {
         positions: this.selectedCameraPositions,
@@ -524,6 +555,20 @@ export default {
           console.error(error);
         });
     },
+    getRemainingTime() {
+      console.log("getting remaining Time")
+      axios.get(`${this.apiAddress}/getRemainingTime`)
+        .then((response) => {
+          console.log(response.data);
+          this.remainingImages = response.data.remainingFrames;
+          this.remainingTime = response.data.remainingTime * 0.75 + this.remainingTime * 0.25;
+          
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
     GetRenderedImage() {
       this.SubmitRenderOptions();
 
@@ -538,6 +583,30 @@ export default {
         ctx.fillText('Rendering...', canvas.width / 2 - 60, canvas.height / 2);
       }
 
+      // Start periodic status checks
+      this.statusInterval = setInterval(() => {
+        this.getRemainingTime();
+        
+        // Update the canvas with status information
+        if (canvas) {
+          const ctx = canvas.getContext("2d");
+          
+          // Draw background
+          ctx.fillStyle = '#333';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Draw rendering status
+          ctx.fillStyle = '#fff';
+          ctx.font = '20px Arial';
+          ctx.fillText('Rendering...', canvas.width / 2 - 60, canvas.height / 2 - 30);
+          
+          // Draw remaining time info
+          ctx.font = '16px Arial';
+          ctx.fillText(`Remaining Frames: ${this.remainingImages.toFixed(2)}`, canvas.width / 2 - 80, canvas.height / 2 + 10);
+          ctx.fillText(`Estimated Time: ${this.remainingTime.toFixed(2)} seconds`, canvas.width / 2 - 100, canvas.height / 2 + 40);
+        }
+      }, 500); // Check every 0.5 seconds
+
       setTimeout(() => {
         axios
           .get(`${this.apiAddress}/getCurrentImage`, {
@@ -547,6 +616,9 @@ export default {
             responseType: 'arraybuffer'  // This is critical for binary data
           })
           .then((response) => {
+            // Stop periodic status checks
+            clearInterval(this.statusInterval);
+            
             // Convert arraybuffer to blob
             const blob = new Blob([response.data], { type: "image/png" });
 
@@ -592,6 +664,9 @@ export default {
             image.src = imageUrl;
           })
           .catch((error) => {
+            // Stop periodic status checks
+            clearInterval(this.statusInterval);
+            
             console.error("API error:", error);
 
             // Show error message on canvas
@@ -672,6 +747,7 @@ export default {
         b: Number(this.sliders[3].value),
         paintTexture: this.binaryOptions[0].value,
         rayMarchingVersion: this.RaymarchingVersion,
+        volumeRenderingVersion: this.VolumeRenderingVersion,
       };
       axios
         .post(`${this.apiAddress}/submitRenderOptions`, renderOptions)
