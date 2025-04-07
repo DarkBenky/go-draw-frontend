@@ -75,44 +75,33 @@
         <button @click="moveCamera" class="control-btn interpolate-btn">
           <span>Interpolate Between Positions</span>
         </button>
-        
+
+        <button @click="savePositionsToDisk" class="control-btn save-btn">
+          <span>Save Positions to Disk</span>
+        </button>
+
+        <button class="control-btn load-btn" @click="$refs.fileInput.click">
+          <span class="btn-icon">📂</span>
+          <span>Load Positions</span>
+        </button>
+        <input ref="fileInput" type="file" @change="loadPositionsFromDisk" accept=".json" style="display: none" />
+
         <div class="duration-control">
           <label>Duration (s):</label>
           <div class="duration-inputs">
-            <input 
-              type="range" 
-              v-model.number="renderDuration" 
-              min="1" 
-              max="32" 
-              step="1"
-              class="duration-slider" 
-            />
-            <input 
-              type="number" 
-              v-model.number="renderDuration" 
-              min="1" 
-              max="32" 
-              step="1" 
-              class="duration-input" 
-            />
+            <input type="range" v-model.number="renderDuration" min="1" max="32" step="1" class="duration-slider" />
+            <input type="number" v-model.number="renderDuration" min="1" max="32" step="1" class="duration-input" />
           </div>
         </div>
       </div>
 
       <div class="camera-positions-grid">
-        <div 
-          v-for="(cameraPosition, index) in cameraPositions" 
-          :key="index" 
-          class="camera-card"
-          :class="{ 'selected': isCameraSelected(cameraPosition) }"
-        >
+        <div v-for="(cameraPosition, index) in cameraPositions" :key="index" class="camera-card"
+          :class="{ 'selected': isCameraSelected(cameraPosition) }">
           <div class="camera-card-header">
             <span class="camera-index">Camera #{{ index + 1 }}</span>
-            <button 
-              @click="toggleCameraSelection(cameraPosition)" 
-              class="select-camera-btn"
-              :class="{ 'selected': isCameraSelected(cameraPosition) }"
-            >
+            <button @click="toggleCameraSelection(cameraPosition)" class="select-camera-btn"
+              :class="{ 'selected': isCameraSelected(cameraPosition) }">
               {{ isCameraSelected(cameraPosition) ? '✓ Selected' : 'Select' }}
             </button>
           </div>
@@ -410,8 +399,8 @@ export default {
   methods: {
     moveCamera() {
       const response = {
-        positions : this.selectedCameraPositions,
-        timeDuration : this.renderDuration
+        positions: this.selectedCameraPositions,
+        timeDuration: this.renderDuration
       }
       axios
         .post(`${this.apiAddress}/moveCamera`, response)
@@ -421,6 +410,85 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+    },
+    savePositionsToDisk() {
+      if (!this.cameraPositions.length) {
+        alert('No camera positions to save');
+        return;
+      }
+
+      try {
+        // Format positions for saving
+        const positions = this.cameraPositions.map(pos => ({
+          x: pos.x,
+          y: pos.y,
+          z: pos.z,
+          cameraX: pos.cameraX,
+          cameraY: pos.cameraY,
+        }));
+
+        const blob = new Blob([JSON.stringify(positions, null, 2)], {
+          type: "application/json"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `camera_positions_${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+      } catch (error) {
+        console.error('Error saving positions:', error);
+        alert('Error saving camera positions');
+      }
+    },
+    loadPositionsFromDisk(event) {
+      const file = event.target.files?.[0];
+      if (!file) {
+        console.error('No file selected');
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        try {
+          const positions = JSON.parse(e.target.result);
+          if (!Array.isArray(positions)) {
+            throw new Error('Invalid file format: expected array of positions');
+          }
+
+          this.cameraPositions = positions.map(pos => ({
+            x: Number(pos.x) || 0,
+            y: Number(pos.y) || 0,
+            z: Number(pos.z) || 0,
+            cameraX: Number(pos.cameraX) || 0,
+            cameraY: Number(pos.cameraY) || 0
+          }));
+
+          // Clear any previous selections
+          this.selectedCameraPositions = [];
+          
+          // Reset the file input value
+          event.target.value = '';
+
+        } catch (error) {
+          console.error('Error loading camera positions:', error);
+          alert('Error loading camera positions file. Please check the file format.');
+        }
+      };
+
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+        alert('Error reading file');
+        // Reset the file input value on error too
+        event.target.value = '';
+      };
+
+      reader.readAsText(file);
     },
     updateSphere(index) {
       let sphere = this.spheres[0][index];
@@ -629,7 +697,7 @@ export default {
       const index = this.selectedCameraPositions.findIndex(
         pos => this.isSamePosition(pos, cameraPosition)
       );
-      
+
       if (index === -1) {
         // Add to selection
         this.selectedCameraPositions.push(cameraPosition);
@@ -638,35 +706,35 @@ export default {
         this.selectedCameraPositions.splice(index, 1);
       }
     },
-    
+
     // Check if a camera is currently selected
     isCameraSelected(cameraPosition) {
       return this.selectedCameraPositions.some(
         pos => this.isSamePosition(pos, cameraPosition)
       );
     },
-    
+
     // Helper to compare camera positions
     isSamePosition(pos1, pos2) {
       return (
-        pos1.x === pos2.x && 
-        pos1.y === pos2.y && 
+        pos1.x === pos2.x &&
+        pos1.y === pos2.y &&
         pos1.z === pos2.z &&
         pos1.cameraX === pos2.cameraX &&
         pos1.cameraY === pos2.cameraY
       );
     },
-    
+
     // Select all cameras
     selectAllCameras() {
       this.selectedCameraPositions = [...this.cameraPositions];
     },
-    
+
     // Clear camera selection
     clearCameraSelection() {
       this.selectedCameraPositions = [];
     },
-    
+
     // Remove camera position from the list
     removeCameraPosition(index) {
       // Remove from selection if it's there
@@ -674,33 +742,33 @@ export default {
       const selIndex = this.selectedCameraPositions.findIndex(
         pos => this.isSamePosition(pos, removed)
       );
-      
+
       if (selIndex !== -1) {
         this.selectedCameraPositions.splice(selIndex, 1);
       }
-      
+
       // Remove from main list
       this.cameraPositions.splice(index, 1);
     },
-    
+
     // Move to all selected positions in sequence
     moveToSelectedPositions() {
       if (this.selectedCameraPositions.length === 0) return;
-      
+
       // Implementation options:
       // 1. Move to first selected position
       this.moveToPosition(this.selectedCameraPositions[0]);
-      
+
       // OR 2. Move through all positions with some delay
       // this.moveToMultiplePositions(0);
     },
-    
+
     // Optional: move through multiple positions in sequence
     moveToMultiplePositions(index) {
       if (index >= this.selectedCameraPositions.length) return;
-      
+
       this.moveToPosition(this.selectedCameraPositions[index]);
-      
+
       setTimeout(() => {
         this.moveToMultiplePositions(index + 1);
       }, 1000); // 1 second delay between moves
@@ -1387,7 +1455,7 @@ label {
 
 .camera-index {
   font-weight: 600;
-  color: var(--accent-primary);
+  color: var (--accent-primary);
 }
 
 .select-camera-btn {
@@ -1487,11 +1555,11 @@ label {
     align-items: stretch;
     gap: 12px;
   }
-  
+
   .camera-control-buttons {
     flex-direction: column;
   }
-  
+
   .camera-positions-grid {
     grid-template-columns: 1fr;
   }
