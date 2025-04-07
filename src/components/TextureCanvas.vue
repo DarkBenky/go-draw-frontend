@@ -20,6 +20,15 @@
             <!-- <button @click="openNormalMapGenerator" class="custom-file-upload tool-button">
                 Project Render to Texture
             </button> -->
+            <!-- <button @click="saveTextureData" class="custom-file-upload tool-button">
+                <span class="btn-icon">💾</span>
+                Save Textures
+            </button>
+            <label class="custom-file-upload tool-button">
+                <input type="file" accept=".json" @change="loadTextureData" ref="textureDataInput" />
+                <span class="btn-icon">📂</span>
+                Load Textures
+            </label> -->
         </div>
         <div class="texture-editor">
             <div class="texture-list">
@@ -374,6 +383,98 @@ export default {
         },
         openNormalMapGenerator() {
             window.open('https://cpetry.github.io/NormalMap-Online/', '_blank');
+        },
+        saveTextureData() {
+            try {
+                // Create a complete texture data object
+                const textureData = {
+                    textures: this.texturesRGBA_Float32.map(t => Array.from(t.data)),
+                    normals: this.normals.map(n => Array.from(n.data)),
+                    normalsImage: this.normalsImage.map(img =>
+                        img ? Array.from(img.data) : null
+                    ),
+                    properties: this.textureProperties,
+                    materialProperties: this.MaterialProperties
+                };
+
+                // Convert to JSON and create blob
+                const blob = new Blob([JSON.stringify(textureData, null, 2)], {
+                    type: 'application/json'
+                });
+
+                // Create download link
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `texture_data_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (error) {
+                console.error('Error saving texture data:', error);
+                alert('Error saving texture data');
+            }
+        },
+
+        loadTextureData(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    // Restore textures
+                    data.textures.forEach((textureData, index) => {
+                        this.texturesRGBA_Float32[index].data = new Float32Array(textureData);
+                    });
+
+                    // Restore normals
+                    data.normals.forEach((normalData, index) => {
+                        this.normals[index].data = new Float32Array(normalData);
+                    });
+
+                    // Restore normal images
+                    data.normalsImage.forEach((imgData, index) => {
+                        if (imgData) {
+                            const imageData = new ImageData(
+                                new Uint8ClampedArray(imgData),
+                                128,
+                                128
+                            );
+                            this.normalsImage[index] = imageData;
+                        }
+                    });
+
+                    // Restore properties
+                    this.textureProperties = data.properties;
+
+                    // Emit material properties update
+                    this.$emit('update:MaterialProperties', data.materialProperties);
+
+                    // Refresh current texture display
+                    this.loadTexture(this.currentTextureIndex);
+
+                    // Clear file input
+                    event.target.value = '';
+
+                } catch (error) {
+                    console.error('Error loading texture data:', error);
+                    alert('Error loading texture data. Please check the file format.');
+                    event.target.value = '';
+                }
+            };
+
+            reader.onerror = () => {
+                alert('Error reading file');
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
         }
     }
 };
@@ -484,10 +585,31 @@ canvas {
 }
 
 .tool-button {
-    min-width: 120px;
-    text-align: center;
-    white-space: nowrap;
-    padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 120px;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.tool-button:hover {
+  background: var(--accent-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.custom-file-upload .btn-icon {
+  margin-right: 6px;
+  font-size: 1.1rem;
 }
 
 .custom-file-upload {

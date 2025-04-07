@@ -27,6 +27,37 @@
             <span class="btn-icon"></span>
             <span>{{ showImage ? "Hide Image" : "Show Image" }}</span>
           </button>
+          <button @click="downloadBVH" class="action-btn secondary-btn">
+            <span>Download BVH</span>
+          </button>
+          <button @click="downloadBVHLean" class="action-btn secondary-btn">
+            <span>Download Lean BVH</span>
+          </button>
+          <!-- Add these buttons to your button-panel after the download buttons -->
+          <label class="action-btn secondary-btn upload-btn">
+            <!-- <span class="btn-icon">📤</span> -->
+            <span>Upload BVH</span>
+            <input 
+              type="file" 
+              @change="uploadBVH" 
+              accept=".json"
+              ref="bvhFileInput"
+              style="display: none"
+            />
+          </label>
+
+          <!-- Upload BVH Lean Button -->
+          <label class="action-btn secondary-btn upload-btn">
+            <!-- <span class="btn-icon">📤</span> -->
+            <span>Upload BVH Lean</span>
+            <input 
+              type="file" 
+              @change="uploadBVHLean" 
+              accept=".json"
+              ref="bvhLeanFileInput"
+              style="display: none"
+            />
+          </label>
         </div>
 
         <!-- Camera & Scene Controls -->
@@ -848,8 +879,117 @@ export default {
       setTimeout(() => {
         this.moveToMultiplePositions(index + 1);
       }, 1000); // 1 second delay between moves
+    },
+    downloadBVH() {
+      axios({
+        url: `${this.apiAddress}/getCurrentBVH`,
+        method: 'GET',
+        responseType: 'blob'
+      })
+        .then((response) => {
+          // Create blob link to download
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          
+          // Create filename with timestamp
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          link.setAttribute('download', `bvh_${timestamp}.json`);
+          
+          // Append link, trigger download, and cleanup
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        })
+        .catch((error) => {
+          console.error('Error downloading BVH:', error);
+          alert('Error downloading BVH file. Please try again.');
+        });
+    },
+    downloadBVHLean() {
+      axios({
+        url: `${this.apiAddress}/getCurrentBVHLean`,
+        method: 'GET',
+        responseType: 'blob'
+      })
+        .then((response) => {
+          // Create blob link to download
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          
+          // Create filename with timestamp
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          link.setAttribute('download', `bvh_lean_${timestamp}.json`);
+          
+          // Append link, trigger download, and cleanup
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        })
+        .catch((error) => {
+          console.error('Error downloading Lean BVH:', error);
+          alert('Error downloading Lean BVH file. Please try again.');
+        });
+    },
+    uploadBVH(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+  
+      const formData = new FormData();
+      formData.append('bvhFile', file);
+  
+      axios.post(`${this.apiAddress}/submitBVH`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(response => {
+        console.log('BVH uploaded successfully:', response.data);
+        // Show success message
+        alert('BVH uploaded successfully');
+      })
+      .catch(error => {
+        console.error('Error uploading BVH:', error);
+        // Show error message
+        alert('Error uploading BVH: ' + (error.response?.data?.error || error.message));
+      })
+      .finally(() => {
+        // Reset file input
+        event.target.value = '';
+      });
+    },
+  
+    uploadBVHLean(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+  
+      const formData = new FormData();
+      formData.append('bvhFile', file);
+  
+      axios.post(`${this.apiAddress}/submitBVHLean`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(response => {
+        console.log('BVH Lean uploaded successfully:', response.data);
+        // Show success message
+        alert('BVH Lean uploaded successfully');
+      })
+      .catch(error => {
+        console.error('Error uploading BVH Lean:', error);
+        // Show error message
+        alert('Error uploading BVH Lean: ' + (error.response?.data?.error || error.message));
+      })
+      .finally(() => {
+        // Reset file input
+        event.target.value = '';
+      });
     }
-  },
+  }
 };
 </script>
 
@@ -1130,7 +1270,7 @@ label {
 
 .sphere-title {
   font-size: 1rem;
-  color: var(--accent-primary);
+  color: var (--accent-primary);
   margin: 0;
 }
 
@@ -1155,7 +1295,7 @@ label {
 .control-label {
   font-weight: 500;
   margin-bottom: 8px;
-  color: var(--text-secondary);
+  color: var (--text-secondary);
 }
 
 .position-controls {
@@ -1508,7 +1648,7 @@ label {
 }
 
 .camera-card {
-  background: var(--bg-secondary);
+  background: var (--bg-secondary);
   border-radius: var(--border-radius);
   padding: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
