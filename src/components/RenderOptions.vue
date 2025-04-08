@@ -118,6 +118,10 @@
           <span>Save Positions to Disk</span>
         </button>
 
+        <button @click="stopAnimation" class="control-btn save-btn">
+          <span>Stop Animation</span>
+        </button>
+
         <button class="control-btn load-btn" @click="$refs.fileInput.click">
           <span class="btn-icon">📂</span>
           <span>Load Positions</span>
@@ -434,7 +438,7 @@ export default {
       RaymarchingVersion: "V2",
       gamma: 0.25,
       sliders: [
-        { name: "Light Intensity", value: 3 },
+        { name: "Light Intensity", value: 5 },
         { name: "R", value: 1 },
         { name: "G", value: 1 },
         { name: "B", value: 1 },
@@ -448,6 +452,16 @@ export default {
     };
   },
   methods: {
+    stopAnimation() {
+      axios
+        .get(`${this.apiAddress}/stopAnimation`)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     LockCamera() {
       this.lockedCamera = !this.lockedCamera;
       axios
