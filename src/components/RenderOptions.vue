@@ -270,7 +270,7 @@
             </select>
           </div>
           <div class="select-group">
-            <label>Version</label>
+            <label>RayMarching Rendering Version</label>
             <select v-model="RaymarchingVersion">
               <option v-for="version in RaymarchingVersions" :key="version" :value="version">
                 {{ version }}
@@ -278,7 +278,7 @@
             </select>
           </div>
           <div class="select-group">
-            <label>Version</label>
+            <label>Volume Rendering Version</label>
             <select v-model="VolumeRenderingVersion">
               <option v-for="version in VolumeRenderingVersions" :key="version" :value="version">
                 {{ version }}

@@ -1,360 +1,282 @@
 <template>
-    <div class="color-picker">
-      <h2>Volume Picker</h2>
-  
-      <button @click="submitVolumeColors">Submit Volume Colors</button>
-      
+  <div class="color-picker">
+    <h2>Volume Picker</h2>
 
-      <!-- Randomness Select -->
-      <div class="randomness-select">
-        <label>Color Randomness:</label>
-        <select v-model="colorRandomnessVoxel">
-          <option value="none">None</option>
-          <option value="random">Random</option>
-        </select>
-      </div>
+    <button @click="submitVolumeColors">Submit Volume Colors</button>
 
-      <!-- Render Voxels Select -->
-      <div class="randomness-select">
-        <label>Render Voxels</label>
-        <select v-model="renderVoxel">
-          <option value="false">False</option>
-          <option value="true">True</option>
-        </select>
-      </div>
+    <!-- Randomness Select -->
+    <div class="randomness-select">
+      <label>Color Randomness:</label>
+      <select v-model="colorRandomnessVoxel">
+        <option value="none">None</option>
+        <option value="random">Random</option>
+      </select>
+    </div>
 
-      <!-- Render Voxels Select -->
-      <div class="randomness-select">
-        <label>OverWrite Voxels</label>
-        <select v-model="overWriteVoxel">
-          <option value="false">False</option>
-          <option value="true">True</option>
-        </select>
-      </div>
+    <!-- Render Voxels Select -->
+    <div class="randomness-select">
+      <label>Render Voxels</label>
+      <select v-model="renderVoxel">
+        <option value="false">False</option>
+        <option value="true">True</option>
+      </select>
+    </div>
 
-      <!-- Render Voxels Select -->
-      <div class="randomness-select">
-        <label>Voxel Modification</label>
-        <select v-model="voxelModification">
-          <option value="draw">Draw</option>
-          <option value="erase">Erase</option>
-          <option value="add">Add</option>
-          <option value="none">None</option>
-        </select>
-      </div>
+    <!-- Render Voxels Select -->
+    <div class="randomness-select">
+      <label>OverWrite Voxels</label>
+      <select v-model="overWriteVoxel">
+        <option value="false">False</option>
+        <option value="true">True</option>
+      </select>
+    </div>
 
-      <!-- Render Voxels Select -->
-      <div v-if="voxelModification != 'none'" class="randomness-select">
-        <label>Add Use Randomness For Painting</label>
-        <select v-model="UseRandomnessPaint">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-      </div>
+    <!-- Render Voxels Select -->
+    <div class="randomness-select">
+      <label>Voxel Modification</label>
+      <select v-model="voxelModification">
+        <option value="draw">Draw</option>
+        <option value="erase">Erase</option>
+        <option value="add">Add</option>
+        <option value="none">None</option>
+      </select>
+    </div>
 
-      <!-- Render Voxels Select -->
-      <div class="randomness-select">
-        <label>Convert Voxels To Smoke</label>
-        <select v-model="convertVoxelsToSmoke">
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
-      </div>
-      
-  
-      <!-- Add after randomness select -->
-      <div class="randomness-control" v-if="colorRandomnessVoxel === 'random'">
-        <label>Randomness Scale:</label>
-        <div class="slider-v2">
-          <input
-            type="range"
-            v-model.number="randomnessScaleVoxel"
-            min="1"
-            max="255"
-            step="1"
-          />
-          <input
-            type="number"
-            v-model.number="randomnessScaleVoxel"
-            min="1"
-            max="255"
-            class="number-input"
-          />
-        </div>
-      </div>
-      
-  
-      <!-- Voxel Color Section -->
-      <div class="color-section">
-        <h3>Voxel Color</h3>
-        <div class="channel-inputs">
-          <div v-for="channel in voxelColor" :key="channel.name" class="channel">
-            <label>{{ channel.name }}:</label>
-            <input
-              type="range"
-              v-model.number="channel.value"
-              min="0"
-              max="255"
-            />
-            <input
-              type="number"
-              v-model.number="channel.value"
-              min="0"
-              max="255"
-              class="number-input"
-            />
-            <label>Mul:</label>
-            <input
-              type="range"
-              v-model.number="channel.multiplier"
-              min="1"
-              max="10"
-              step="0.1"
-            />
-            <input
-              type="number"
-              v-model.number="channel.multiplier"
-              min="1"
-              max="10"
-              step="0.1"
-              class="number-input"
-            />
-          </div>
-        </div>
-        <div class="color-preview" :style="{ backgroundColor: voxelPreviewColor }"></div>
-      </div>
-  
-      <!-- Smoke Color Section -->
+    <!-- Render Voxels Select -->
+    <div v-if="voxelModification != 'none'" class="randomness-select">
+      <label>Add Use Randomness For Painting</label>
+      <select v-model="UseRandomnessPaint">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
 
-      <!-- Randomness Select -->
-      <div class="randomness-select">
-        <label>Color Randomness:</label>
-        <select v-model="colorRandomness">
-          <option value="none">None</option>
-          <option value="random">Random</option>
-        </select>
-      </div>
+    <!-- Render Voxels Select -->
+    <div class="randomness-select">
+      <label>Convert Voxels To Smoke</label>
+      <select v-model="convertVoxelsToSmoke">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
 
+    <!-- Add this after the "Convert Voxels To Smoke" select -->
+    <div class="randomness-select">
+      <label>Voxel Version:</label>
+      <select v-model="voxelVersion">
+        <option v-for="version in voxelVersions" :key="version.name" :value="version.name">
+          {{ version.name }} - {{ version.description }}
+        </option>
+      </select>
+    </div>
 
-       <!-- Render Voxels Select -->
-       <div class="randomness-select">
-        <label>Render Volume</label>
-        <select v-model="renderVolume">
-          <option value="false">False</option>
-          <option value="true">True</option>
-        </select>
-      </div>
-  
-      <!-- Add after randomness select -->
-      <div class="randomness-control" v-if="colorRandomness === 'random'">
-        <label>Randomness Scale:</label>
-        <div class="slider-v2">
-          <input
-            type="range"
-            v-model.number="randomnessScale"
-            min="1"
-            max="255"
-            step="1"
-          />
-          <input
-            type="number"
-            v-model.number="randomnessScale"
-            min="1"
-            max="255"
-            class="number-input"
-          />
-        </div>
-      </div>
-
-
-      <div class="color-section">
-        <h3>Smoke Color</h3>
-        <div class="channel-inputs">
-          <div v-for="channel in smokeColor" :key="channel.name" class="channel">
-            <label>{{ channel.name }}:</label>
-            <input
-              type="range"
-              v-model.number="channel.value"
-              min="0"
-              max="255"
-            />
-            <input
-              type="number"
-              v-model.number="channel.value"
-              min="0"
-              max="255"
-              class="number-input"
-            />
-            <label>Mul:</label>
-            <input
-              type="range"
-              v-model.number="channel.multiplier"
-              min="1"
-              max="10"
-              step="0.1"
-            />
-            <input
-              type="number"
-              v-model.number="channel.multiplier"
-              min="1"
-              max="10"
-              step="0.1"
-              class="number-input"
-            />
-          </div>
-        </div>
-        <div class="color-preview" :style="{ backgroundColor: smokePreviewColor }"></div>
-      </div>
-  
-      <!-- Density & Transmittance -->
-      <div class="sliders volume-properties">
-        <h3>Volume Properties</h3>
-        <div class="slider-v2">
-          <label>Density:</label>
-          <input
-            type="range"
-            v-model.number="density"
-            min="0"
-            max="0.1"
-            step="0.00001"
-          />
-          <input
-            type="number"
-            v-model.number="density"
-            min="0"
-            max="0.1"
-            step="0.0001"
-            class="number-input"
-          />
-        </div>
-        <div class="slider-v2">
-          <label>Transmittance:</label>
-          <input
-            type="range"
-            v-model.number="transmittance"
-            min="0"
-            max="255"
-            step="0.01"
-          />
-          <input
-            type="number"
-            v-model.number="transmittance"
-            min="0"
-            max="1"
-            step="0.01"
-            class="number-input"
-          />
-        </div>
+    <!-- Add after randomness select -->
+    <div class="randomness-control" v-if="colorRandomnessVoxel === 'random'">
+      <label>Randomness Scale:</label>
+      <div class="slider-v2">
+        <input type="range" v-model.number="randomnessScaleVoxel" min="1" max="255" step="1" />
+        <input type="number" v-model.number="randomnessScaleVoxel" min="1" max="255" class="number-input" />
       </div>
     </div>
-  </template>
-  
-  <script>
-  import { inject } from "vue";
-  import axios from "axios";
-  
-  export default {
-    name: "VolumeColorPicker",
-    setup() {
-      const apiAddress = inject("apiAddress");
-      return { apiAddress };
-    },
-    data() {
-      return {
-        colorRandomness: "none",
-        colorRandomnessVoxel: "none",
-        voxelColor: [
-          { name: "R", value: 128, multiplier: 1 },
-          { name: "G", value: 128, multiplier: 1 },
-          { name: "B", value: 128, multiplier: 1 },
-          { name: "A", value: 255, multiplier: 1 },
-        ],
-        smokeColor: [
-          { name: "R", value: 200, multiplier: 1 },
-          { name: "G", value: 200, multiplier: 1 },
-          { name: "B", value: 200, multiplier: 1 },
-          { name: "A", value: 100, multiplier: 1 },
-        ],
-        density: 0.0,
-        transmittance: 0.5,
-        randomnessScale: 10,
-        randomnessScaleVoxel : 10,
-        renderVolume : false,
-        renderVoxel : false,
-        overWriteVoxel : false,
-        voxelModification : "draw",
-        UseRandomnessPaint: "yes",
-        convertVoxelsToSmoke: 'no',
-      };
-    },
-    computed: {
-      voxelPreviewColor() {
-        const [r, g, b, a] = this.voxelColor;
-        return this.toRGBA(r, g, b, a);
-      },
-      smokePreviewColor() {
-        const [r, g, b, a] = this.smokeColor;
-        return this.toRGBA(r, g, b, a);
-      },
-    },
-    methods: {
-      applyRandomness(channel) {
-        if (this.colorRandomness === "random") {
-          const randValue = Math.random() * this.randomnessScale;
-          channel.value = Math.min(
-            Math.max(Math.round(channel.value + randValue - this.randomnessScale/2), 0),
-            255
-          );
-        }
-      },
-      toRGBA(r, g, b, a) {
-        const rr = r.value * r.multiplier;
-        const gg = g.value * g.multiplier;
-        const bb = b.value * b.multiplier;
-        const aa = (a.value * a.multiplier) / 255;
-        return `rgba(${Math.round(rr)}, ${Math.round(gg)}, ${Math.round(bb)}, ${aa.toFixed(2)})`;
-      },
-      submitVolumeColors() {
-        const voxel = this.convertChannels(this.voxelColor);
-        const smoke = this.convertChannels(this.smokeColor);
-        
-        const payload = {
-          voxelColorR: voxel[0].value,
-          voxelColorG: voxel[1].value,
-          voxelColorB: voxel[2].value,
-          voxelColorA: voxel[3].value,
-          smokeColorR: smoke[0].value,
-          smokeColorG: smoke[1].value,
-          smokeColorB: smoke[2].value,
-          smokeColorA: smoke[3].value,
-          density: this.density,
-          transmittance: this.transmittance,
-          randomness: this.colorRandomness === "random" ? this.randomnessScale : 0,
-          randomnessVoxel: this.colorRandomnessVoxel === "random" ? this.randomnessScaleVoxel : 0,
-          renderVolume: this.renderVolume === "true", // Convert to boolean
-          renderVoxel: this.renderVoxel === "true",    // Convert to boolean
-          overWriteVoxel: this.overWriteVoxel === "true",    // Convert to boolean
-          voxelModification: this.voxelModification,
-          useRandomnessForPaint: this.UseRandomnessPaint === "yes",    // Convert to boolean\
-          convertVoxelsToSmoke: this.convertVoxelsToSmoke === 'yes',
-        };
-      
-        axios
-          .post(`${this.apiAddress}/submitVoxel`, payload)
-          .then((res) => console.log(res.data))
-          .catch((err) => console.error(err));
-      },
-      convertChannels(arr) {
-        return arr.map((chan) => ({
-          name: chan.name,
-          value: chan.value * chan.multiplier,
-        }));
-      },
-    },
-  };
-  </script>
 
-  <style scoped>
+    <!-- Voxel Color Section -->
+    <div class="color-section">
+      <h3>Voxel Color</h3>
+      <div class="channel-inputs">
+        <div v-for="channel in voxelColor" :key="channel.name" class="channel">
+          <label>{{ channel.name }}:</label>
+          <input type="range" v-model.number="channel.value" min="0" max="255" />
+          <input type="number" v-model.number="channel.value" min="0" max="255" class="number-input" />
+          <label>Mul:</label>
+          <input type="range" v-model.number="channel.multiplier" min="1" max="10" step="0.1" />
+          <input type="number" v-model.number="channel.multiplier" min="1" max="10" step="0.1" class="number-input" />
+        </div>
+      </div>
+      <div class="color-preview" :style="{ backgroundColor: voxelPreviewColor }"></div>
+    </div>
+
+    <!-- Smoke Color Section -->
+
+    <!-- Randomness Select -->
+    <div class="randomness-select">
+      <label>Color Randomness:</label>
+      <select v-model="colorRandomness">
+        <option value="none">None</option>
+        <option value="random">Random</option>
+      </select>
+    </div>
+
+    <!-- Render Voxels Select -->
+    <div class="randomness-select">
+      <label>Render Volume</label>
+      <select v-model="renderVolume">
+        <option value="false">False</option>
+        <option value="true">True</option>
+      </select>
+    </div>
+
+    <!-- Add after randomness select -->
+    <div class="randomness-control" v-if="colorRandomness === 'random'">
+      <label>Randomness Scale:</label>
+      <div class="slider-v2">
+        <input type="range" v-model.number="randomnessScale" min="1" max="255" step="1" />
+        <input type="number" v-model.number="randomnessScale" min="1" max="255" class="number-input" />
+      </div>
+    </div>
+
+    <div class="color-section">
+      <h3>Smoke Color</h3>
+      <div class="channel-inputs">
+        <div v-for="channel in smokeColor" :key="channel.name" class="channel">
+          <label>{{ channel.name }}:</label>
+          <input type="range" v-model.number="channel.value" min="0" max="255" />
+          <input type="number" v-model.number="channel.value" min="0" max="255" class="number-input" />
+          <label>Mul:</label>
+          <input type="range" v-model.number="channel.multiplier" min="1" max="10" step="0.1" />
+          <input type="number" v-model.number="channel.multiplier" min="1" max="10" step="0.1" class="number-input" />
+        </div>
+      </div>
+      <div class="color-preview" :style="{ backgroundColor: smokePreviewColor }"></div>
+    </div>
+
+    <!-- Density & Transmittance -->
+    <div class="sliders volume-properties">
+      <h3>Volume Properties</h3>
+      <div class="slider-v2">
+        <label>Density:</label>
+        <input type="range" v-model.number="density" min="0" max="0.1" step="0.00001" />
+        <input type="number" v-model.number="density" min="0" max="0.1" step="0.0001" class="number-input" />
+      </div>
+      <div class="slider-v2">
+        <label>Transmittance:</label>
+        <input type="range" v-model.number="transmittance" min="0" max="255" step="0.01" />
+        <input type="number" v-model.number="transmittance" min="0" max="1" step="0.01" class="number-input" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { inject } from "vue";
+import axios from "axios";
+
+export default {
+  name: "VolumeColorPicker",
+  setup() {
+    const apiAddress = inject("apiAddress");
+    return { apiAddress };
+  },
+  data() {
+    return {
+      colorRandomness: "none",
+      colorRandomnessVoxel: "none",
+      voxelColor: [
+        { name: "R", value: 128, multiplier: 1 },
+        { name: "G", value: 128, multiplier: 1 },
+        { name: "B", value: 128, multiplier: 1 },
+        { name: "A", value: 255, multiplier: 1 },
+      ],
+      smokeColor: [
+        { name: "R", value: 200, multiplier: 1 },
+        { name: "G", value: 200, multiplier: 1 },
+        { name: "B", value: 200, multiplier: 1 },
+        { name: "A", value: 100, multiplier: 1 },
+      ],
+      density: 0.0,
+      transmittance: 0.5,
+      randomnessScale: 10,
+      randomnessScaleVoxel: 10,
+      renderVolume: false,
+      renderVoxel: false,
+      voxelVersions: [
+        {name: "V1", description: "Hard Lighting"},
+        {name: "V2", description: "Soft Lighting baked voxel lighting"},
+      ],
+      voxelVersion: "V1",
+      overWriteVoxel: false,
+      voxelModification: "draw",
+      UseRandomnessPaint: "yes",
+      convertVoxelsToSmoke: "no",
+    };
+  },
+  computed: {
+    voxelPreviewColor() {
+      const [r, g, b, a] = this.voxelColor;
+      return this.toRGBA(r, g, b, a);
+    },
+    smokePreviewColor() {
+      const [r, g, b, a] = this.smokeColor;
+      return this.toRGBA(r, g, b, a);
+    },
+  },
+  methods: {
+    applyRandomness(channel) {
+      if (this.colorRandomness === "random") {
+        const randValue = Math.random() * this.randomnessScale;
+        channel.value = Math.min(
+          Math.max(
+            Math.round(channel.value + randValue - this.randomnessScale / 2),
+            0
+          ),
+          255
+        );
+      }
+    },
+    toRGBA(r, g, b, a) {
+      const rr = r.value * r.multiplier;
+      const gg = g.value * g.multiplier;
+      const bb = b.value * b.multiplier;
+      const aa = (a.value * a.multiplier) / 255;
+      return `rgba(${Math.round(rr)}, ${Math.round(gg)}, ${Math.round(
+        bb
+      )}, ${aa.toFixed(2)})`;
+    },
+    submitVolumeColors() {
+      const voxel = this.convertChannels(this.voxelColor);
+      const smoke = this.convertChannels(this.smokeColor);
+
+      const payload = {
+        voxelColorR: voxel[0].value,
+        voxelColorG: voxel[1].value,
+        voxelColorB: voxel[2].value,
+        voxelColorA: voxel[3].value,
+        smokeColorR: smoke[0].value,
+        smokeColorG: smoke[1].value,
+        smokeColorB: smoke[2].value,
+        smokeColorA: smoke[3].value,
+        density: this.density,
+        transmittance: this.transmittance,
+        randomness:
+          this.colorRandomness === "random" ? this.randomnessScale : 0,
+        randomnessVoxel:
+          this.colorRandomnessVoxel === "random"
+            ? this.randomnessScaleVoxel
+            : 0,
+        renderVolume: this.renderVolume === "true", // Convert to boolean
+        renderVoxel: this.renderVoxel === "true", // Convert to boolean
+        overWriteVoxel: this.overWriteVoxel === "true", // Convert to boolean
+        voxelModification: this.voxelModification,
+        useRandomnessForPaint: this.UseRandomnessPaint === "yes", // Convert to boolean
+        convertVoxelsToSmoke: this.convertVoxelsToSmoke === "yes", // Convert to boolean
+        voxelVersion: this.voxelVersion 
+      };
+
+      axios
+        .post(`${this.apiAddress}/submitVoxel`, payload)
+        .then((res) => console.log(res.data))
+        .catch((err) => console.error(err));
+    },
+    convertChannels(arr) {
+      return arr.map((chan) => ({
+        name: chan.name,
+        value: chan.value * chan.multiplier,
+      }));
+    },
+  },
+};
+</script>
+
+<style scoped>
 .color-picker {
   background: var(--bg-secondary);
   border-radius: var(--border-radius);
@@ -429,8 +351,7 @@ button:hover {
   border-radius: var(--border-radius);
   margin-top: var(--spacing-unit);
   border: 2px solid rgba(255, 255, 255, 0.05);
-  background-image: 
-    linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+  background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
     linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
     linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
@@ -483,7 +404,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: calc(var(--border-radius) * 0.5);
   color: var(--text-primary);
   text-align: right;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
 }
 
 select {
@@ -495,7 +416,8 @@ select {
   cursor: pointer;
 }
 
-h2, h3 {
+h2,
+h3 {
   color: var(--text-primary);
   margin-bottom: var(--spacing-unit);
 }
@@ -509,7 +431,7 @@ label {
   .channel {
     grid-template-columns: 30px 1fr 60px;
   }
-  
+
   .slider-v2 {
     grid-template-columns: 100px 1fr 70px;
   }
