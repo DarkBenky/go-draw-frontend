@@ -1,8 +1,27 @@
 <template>
   <div class="color-picker">
     <h2>Volume Picker</h2>
+    <div class="button-group">
+      <button @click="submitVolumeColors" class="submit-btn">
+        <!-- <span class="btn-icon">🎨</span> -->
+        Submit Volume Colors
+      </button>
 
-    <button @click="submitVolumeColors">Submit Volume Colors</button>
+      <button @click="recalculateVoxelLighting" class="recalculate-btn" :disabled="isRecalculating">
+        <!-- <span class="btn-icon">💡</span> -->
+        {{ isRecalculating ? 'Recalculating...' : 'Recalculate Voxel Lighting' }}
+      </button>
+    </div>
+
+    <!-- Add this slider right after the Volume Properties section or before the Recalculate button -->
+    <div class="sliders volume-properties">
+      <h3>Lighting Settings</h3>
+      <div class="slider-v2">
+        <label>Lighting Blur:</label>
+        <input type="range" v-model.number="lightingBlur" min="1" max="10" step="1" />
+        <input type="number" v-model.number="lightingBlur" min="1" max="10" step="1" class="number-input" />
+      </div>
+    </div>
 
     <!-- Randomness Select -->
     <div class="randomness-select">
@@ -153,6 +172,8 @@
         <input type="number" v-model.number="transmittance" min="0" max="1" step="0.01" class="number-input" />
       </div>
     </div>
+
+
   </div>
 </template>
 
@@ -189,14 +210,16 @@ export default {
       renderVolume: false,
       renderVoxel: false,
       voxelVersions: [
-        {name: "V1", description: "Hard Lighting"},
-        {name: "V2", description: "Soft Lighting baked voxel lighting"},
+        { name: "V1", description: "Hard Lighting" },
+        { name: "V2", description: "Soft Lighting baked voxel lighting" },
       ],
       voxelVersion: "V1",
       overWriteVoxel: false,
       voxelModification: "draw",
       UseRandomnessPaint: "yes",
       convertVoxelsToSmoke: "no",
+      isRecalculating: false,
+      lightingBlur: 3, // Default value for lighting blur
     };
   },
   computed: {
@@ -258,7 +281,8 @@ export default {
         voxelModification: this.voxelModification,
         useRandomnessForPaint: this.UseRandomnessPaint === "yes", // Convert to boolean
         convertVoxelsToSmoke: this.convertVoxelsToSmoke === "yes", // Convert to boolean
-        voxelVersion: this.voxelVersion 
+        voxelVersion: this.voxelVersion,
+        lightingBlur: this.lightingBlur,
       };
 
       axios
@@ -271,6 +295,27 @@ export default {
         name: chan.name,
         value: chan.value * chan.multiplier,
       }));
+    },
+    recalculateVoxelLighting() {
+      // Show some feedback that the action is in progress
+      this.isRecalculating = true;
+
+      axios
+        .post(`${this.apiAddress}/recalcualteLighting`, {
+          blur: this.lightingBlur // Send the blur amount to the API
+        })
+        .then((response) => {
+          console.log('Voxel lighting recalculated:', response.data);
+          // Optionally show a success message or visual feedback
+          alert('Voxel lighting recalculated successfully');
+        })
+        .catch((error) => {
+          console.error('Error recalculating voxel lighting:', error);
+          alert('Error recalculating voxel lighting');
+        })
+        .finally(() => {
+          this.isRecalculating = false;
+        });
     },
   },
 };
@@ -435,5 +480,45 @@ label {
   .slider-v2 {
     grid-template-columns: 100px 1fr 70px;
   }
+}
+
+/* Add these styles to your <style> section */
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: var(--spacing-unit);
+  flex-wrap: wrap;
+}
+
+.button-group button {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.recalculate-btn {
+  background: linear-gradient(135deg, #6a3de8, #9a6dff) !important;
+}
+
+.recalculate-btn:hover {
+  background: linear-gradient(135deg, #7a4df8, #8a5dee) !important;
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+/* Make button style disabled when recalculating */
+button:disabled,
+button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 </style>
